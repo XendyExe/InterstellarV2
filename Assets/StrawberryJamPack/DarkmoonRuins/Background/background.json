@@ -1,0 +1,28 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "animated": {
+                "spritesheet": {
+                    "image": "./blackhole.png",
+                    "json": "./blackhole.json",
+                    "animation_name": "blackhole6fps"
+                },
+                "fps": 6
+            },
+            "x": 10,
+            "y": 40
+        },
+        {
+            "path": "./stars0.png"
+        },
+        {
+            "path": "./SpaceBackground.png"
+        },
+        {
+            "path": "./black.png"
+        }
+    ]
+}

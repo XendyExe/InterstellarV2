@@ -1,0 +1,27 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./foreground.png",
+            "tile": "x",
+            "px": 0.1
+        },
+        {
+            "path": "./sand.png",
+            "tile": "x",
+            "px": 0.05
+        },
+        {
+            "path": "./far.png",
+            "tile": "x",
+            "px": 0.025
+        },
+        {
+            "path": "./farther.png",
+            "tile": "x",
+            "px": 0.0125
+        }
+    ]
+}

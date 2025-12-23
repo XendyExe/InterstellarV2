@@ -1,0 +1,39 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./foreground.png",
+            "tile": "x",
+            "px": 0.1,
+            "py": 0.1
+        },
+        {
+            "path": "./dunes.png",
+            "tile": "x",
+            "px": 0.05,
+            "py": 0.05
+        },
+        {
+            "path": "./mountain.png",
+            "tile": "x",
+            "px": 0
+        },
+        {
+            "path": "./clouds.png",
+            "tile": "x",
+            "mx": 1,
+            "mt": 0.25
+        },
+        {
+            "path": "./sun.png"
+        },
+        {
+            "path": "./background.png",
+            "tile": "x",
+            "mx": 1,
+            "mt": 0.5
+        }
+    ]
+}

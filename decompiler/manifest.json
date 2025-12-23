@@ -1,0 +1,27 @@
+{
+    "name": "Drednot unpacker",
+    "description": "Unpacks drednot code",
+    "version": "1",
+    "author": "Xendy",
+    "web_accessible_resources": [
+      {
+        "resources": [
+            "/fetcher.js"
+        ],
+        "matches": ["*://*.drednot.io/*"]
+      }
+    ],
+    "content_scripts": [
+      {
+        "matches": ["*://*.drednot.io/*"],
+        "js": ["inject.js"],
+        "run_at" : "document_start",
+        "all_frames": true
+      }
+    ],
+    "permissions": [
+        "cookies",
+        "webNavigation"
+      ],
+    "manifest_version": 3
+}

@@ -1,0 +1,42 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "animated": {
+                "sprites": [
+                    "./island1/0.png",
+                    "./island1/1.png",
+                    "./island1/2.png",
+                    "./island1/3.png"
+                ],
+                "fps": 4
+            },
+            "tile": "xy",
+            "px": 0.1,
+            "py": 0.1
+        },
+        {
+            "path": "./debris2.png",
+            "tile": "xy",
+            "px": 0.1,
+            "py": 0.1
+        },
+        {
+            "path": "./debris3.png",
+            "tile": "xy",
+            "px": 0.1,
+            "py": 0.1
+        },
+        {
+            "path": "./island0.png",
+            "tile": "xy",
+            "px": 0.1,
+            "py": 0.1
+        },
+        {
+            "path": "./background.png"
+        }
+    ]
+}

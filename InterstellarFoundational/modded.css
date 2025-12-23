@@ -1,0 +1,210 @@
+.IS-modcontainer {
+   width: 1200px;
+   height: 900px;
+   box-sizing: border-box;
+   position: absolute;
+   pointer-events: auto;
+   display: flex;
+   flex-direction: column;
+   justify-self: center;
+}
+
+
+.IS-modwrapper {
+   width: 100%;
+   flex: 1;
+   display: flex;
+   flex-direction: row;
+   gap: 16px;
+   box-sizing: border-box;
+   min-width: 0;
+}
+
+
+
+
+.IS-moddetailscontainer {
+   flex: 1 1 0;
+   width: 0;
+   min-width: 0;
+   box-sizing: border-box;
+   display: flex;
+   flex-direction: column;
+   overflow-y: auto;
+   overflow-x: hidden;
+   padding: 8px;
+}
+
+
+.IS-modentry-overview {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   padding: 6px;
+   box-sizing: border-box;
+   align-self: stretch;
+   min-height: 92px;
+}
+
+
+.IS-modentry-container {
+   align-self: stretch;
+   box-sizing: border-box;
+   margin: 0;
+   min-width: 0;
+   gap: 8px;
+   min-height: 92px;
+   height: auto;
+   border: 1px solid var(--ui-border-color);
+   transition: height 0.5s;
+}
+.IS-modentry-icon {
+   position: relative;
+   flex-shrink: 0;
+   width: 92px;
+   height: 92px;
+   border-radius: 8px;
+   object-fit: cover;
+   background-size: contain;
+   pointer-events: auto;
+   margin-right: 8px;
+}
+.IS-modentry-text {
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   min-width: 0;
+   flex: 1 1 auto;
+}
+.IS-modentry-name {
+   font-weight: bold;
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 1.5em;
+   display: flex;
+   flex-direction: row;
+   flex-wrap: nowrap;
+   align-items: center;
+}
+.IS-modentry-creator {
+   color: #aaa;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+}
+
+
+.IS-tooltip-container {
+ position: relative;
+ cursor: pointer;
+}
+
+
+.IS-tooltip-icon {
+ width: 24px;
+ height: 24px;
+}
+
+
+.IS-tooltip-text {
+   visibility: hidden;
+   width: max-content;
+   max-width: 200px;
+   background-color: #333;
+   color: #fff;
+   text-align: center;
+   border-radius: 6px;
+   padding: 6px 8px;
+   position: absolute;
+   z-index: 10;
+   bottom: 125%;
+   left: 50%;
+   transform: translateX(-50%);
+   opacity: 0;
+   pointer-events: none;
+   transition: opacity 0.3s;
+   font-size: 1rem;
+}
+
+
+.IS-tooltip-text::after {
+   content: "";
+   position: absolute;
+   top: 100%;
+   left: 50%;
+   transform: translateX(-50%);
+   border-width: 5px;
+   border-style: solid;
+   border-color: #333 transparent transparent transparent;
+}
+
+
+.IS-tooltip-container:hover .IS-tooltip-text {
+   visibility: visible;
+   opacity: 1;
+}
+
+
+.IS-move-button {
+   position: absolute;
+   width: 28px;
+   height: 28px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   background: rgba(0, 0, 0, 0.6);
+   color: white;
+   border-radius: 50%;
+   font-size: 16px;
+   opacity: 0;
+   cursor: pointer;
+   transition: opacity 0.25s;
+   z-index: 5;
+}
+.IS-modentry-icon:hover .IS-move-button {
+   opacity: 1;
+}
+
+
+.IS-move-button:hover {
+   background: rgba(255, 255, 255, 0.8);
+   color: black;
+}
+
+
+.IS-move-up {
+   top: 6px;
+   left: 50%;
+   transform: translateX(-50%);
+}
+
+
+.IS-move-down {
+   bottom: 6px;
+   left: 50%;
+   transform: translateX(-50%);
+}
+
+
+.IS-move-left {
+   left: 6px;
+   top: 50%;
+   transform: translateY(-50%);
+}
+
+
+.IS-move-right {
+   right: 6px;
+   top: 50%;
+   transform: translateY(-50%);
+}
+
+
+.IS-mod-detail-container {
+   padding: 8px;
+}
+.IS-mod-detail-footer {
+   margin-top: 8px;
+   color: gray;
+}
+

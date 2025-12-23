@@ -1,0 +1,42 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./fonda_clouds.png",
+            "tile": "x",
+            "px": 0.3
+        },
+        {
+            "path": "./fonda_SmolGear.png",
+            "tile": "x",
+            "px": 0.2
+        },
+        {
+            "path": "./fonda_BeegGear2.png",
+            "tile": "x",
+            "px": 0.18
+        },
+        {
+            "path": "./fonda_BeegGear.png",
+            "tile": "x",
+            "px": 0.15
+        },
+        {
+            "path": "./fonda_Tower.png",
+            "tile": "x",
+            "px": 0.13
+        },
+        {
+            "path": "./fonda_clouds2.png",
+            "tile": "x",
+            "px": 0.11
+        },
+        {
+            "path": "./fonda_background.png",
+            "tile": "x",
+            "px": 0.07
+        }
+    ]
+}

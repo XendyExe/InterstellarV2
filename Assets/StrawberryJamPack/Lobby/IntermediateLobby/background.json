@@ -1,0 +1,33 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./fghills.png",
+            "tile": "xy",
+            "px": 0.1,
+            "y": -25
+        },
+        {
+            "path": "./mghills.png",
+            "tile": "xy",
+            "px": 0.05,
+            "y": -25
+        },
+        {
+            "path": "./puffycloud.png",
+            "tile": "xy",
+            "mx": 1,
+            "mt": 0.2,
+            "y": -10
+        },
+        {
+            "path": "./the moon and the sun.png"
+        },
+        {
+            "path": "./skybox.png",
+            "px": -0.01
+        }
+    ]
+}

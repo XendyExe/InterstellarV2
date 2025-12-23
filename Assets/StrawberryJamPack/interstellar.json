@@ -1,0 +1,38 @@
+{
+    "name": "Strawberry Jam",
+    "id": "interstellar.internal",
+    "creator": "Xendy, SJ Collab Team, DMR Team",
+    "icon": "icon.jpg",
+    "description": "A variety of modded Celeste backgrounds and textures. See https://gamebanana.com/mods/424541. Also contains Darkmoon Ruins, see https://gamebanana.com/mods/393245",
+    "zones": {
+        "The Nest": "./Lobby/zone.json",
+
+        "Hummingbird": "./BeginnerHeartside/zone.json",
+        "Finch": "./IntermediateHeartside/zone.json",
+        "Sparrow": "./AdvancedHeartside/zone.json",
+
+        "Raven": "./ExpertHeartside/zone.json",
+        "Falcon": "./GrandmasterHeartside/zone.json",
+
+        "The Pits": "./Clockwork/zone.json",
+        "Vulture": "./DarkmoonRuins/zone.json",
+        "Canary": "./Paint/zone.json",
+
+        "Super Special Event Zone": "./WorldAbyss/zone.json",
+        "Combat Simulator": "./ExpertHeartside/combatsim.json"
+    },
+    "audio": {
+        "comms_blip.webm": "./sfx/comms.webm",
+        "hit.webm": "./sfx/hit.webm",
+        "pewpew_low.webm": "./sfx/botfire.webm",
+        "fire.webm": "./sfx/fire.webm",
+        "death.webm": "./sfx/break.webm",
+        "reload.webm": "./sfx/reload.webm",
+        "pickup.webm": "./sfx/cargo.webm",
+        "build_tile.webm": "./sfx/fastbreak.webm",
+        "build_machine.webm": "./sfx/longwrench.webm",
+        "no_ammo.webm": "./sfx/failFire.webm"
+    },
+    "menu": ["Raven", "Falcon"],
+    "font": "Lexend-VariableFont_wght.ttf"
+}

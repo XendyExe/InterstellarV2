@@ -1,0 +1,16 @@
+{
+    "name": "Raspberry Roots Heartside",
+    "description": "Lawful - Raspberry Roots [Finch]",
+    "color": "#8ea1b3",
+    "music": "./RaspberryRootsHeartsideLoop.ogg",
+    "filters": {
+    },
+    "subzones": [
+        {
+            "background": "./Background/background.json"
+        }
+    ],
+    "textures": {
+        "tiles_overworld.png": "~/Shared/RaspberryRoots/Textures/tiles_overworld.png"
+    }
+}

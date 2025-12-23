@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Interstellar",
+  "version": "2",
+  "description": "Interstellar mod for drednot.io",
+  "permissions": ["scripting", "tabs"],
+  "host_permissions": ["https://*.drednot.io/*", "http://localhost:9000/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://*.drednot.io/", "https://*.drednot.io/invite/*"],
+      "js": ["inject.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "modloader.js"
+      ],
+      "matches": ["https://*.drednot.io/*"]
+    }
+  ],
+
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "64": "icon64.png",
+    "128": "icon128.png"
+  }
+}

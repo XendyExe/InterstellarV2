@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "module": "commonjs", // Required for typescript files
+    "target": "es6",
+    "types": [],
+    "esModuleInterop": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "paths": {
+      "@interstellar/InterstellarScriptingMod": ["../../cache/tscompile/API/InterstellarScriptingMod"],
+      "@interstellar/StellarAPI": ["../../cache/tscompile/API/StellarAPI"],
+      "@interstellar/InterstellarEvents": ["../../cache/tscompile/API/InterstellarEvents"],
+      "@interstellar/StellarEventManager": ["../../cache/tscompile/API/StellarEventManager"],
+      "@interstellar/StellarCommandsManager": ["../../cache/tscompile/API/StellarCommandsManager"],
+
+      "preact": ["../../_ModdingLibs/preact/index.d.ts"],
+      "msgpack": ["../../_ModdingLibs/msgpack/index.d.ts"]
+    },
+
+    "jsx": "react",
+		"jsxFactory": "h",
+		"jsxFragmentFactory": "Fragment",
+
+    "strict": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "moduleResolution": "node",
+    "lib": ["DOM", "DOM.Iterable", "ES2021"]
+  }
+}

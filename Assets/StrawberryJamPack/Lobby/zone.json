@@ -1,0 +1,113 @@
+{
+    "name": "Lobby",
+    "description": "Safe Zone",
+    "color": "#ffffff",
+    "use_nav": true,
+    "nav_default": 3,
+    "subzones": [
+        {
+            "name": "Blueberry Bay",
+            "description": "Beginner Lobby [The Nest]",
+            "color": "#3e86dd",
+            "background": "./BeginnerLobby/background.json",
+            "music": "/BeginnerLobby/BlueberryBayLoop.ogg",
+            "theme": "~/Shared/BlueberryBay/theme.json",
+            "music_start": 0,
+            "filters": {
+                "AdvancedBloomFilter": {
+                    "threshold": 0.9,
+                    "blur": 20,
+                    "quality": 10,
+                    "bloomScale": 0.1
+                },
+                "AdjustmentFilter": {
+                    "gamma": 1.05
+                }
+            },
+            "textures": {
+                "tiles_overworld.png": "~/Shared/BlueberryBay/tiles_overworld.png"
+            }
+        },
+        {
+            "name": "Raspberry Roots",
+            "description": "Intermediate Lobby [The Nest]",
+            "color": "#8ea1b3",
+            "background": "./IntermediateLobby/background.json",
+            "music": "./IntermediateLobby/RaspberryRootsLoop.ogg",
+            "textures": {
+                "tiles_overworld.png": "~/Shared/RaspberryRoots/Textures/tiles_overworld.png"
+            },
+            "music_start": 302.167,
+            "filters": {
+                "AdjustmentFilter": {
+                    "gamma": 0.8
+                }
+            }
+        },
+        {
+            "name": "Mango Mesa",
+            "description": "Advanced Lobby [The Nest]",
+            "color": "#e8be94",
+            "background": "./AdvancedLobby/background.json",
+            "music": "./AdvancedLobby/MangoMesaLoop.ogg",
+            "music_start": 9.533,
+            "filters": {
+                "AdvancedBloomFilter": {
+                    "threshold": 0.9,
+                    "blur": 10,
+                    "quality": 20,
+                    "bloomScale": 0.1
+                },
+                "AdjustmentFilter": {
+                    "gamma": 1.05
+                }
+            },
+            "textures": {
+                "tiles_overworld.png": "~/Shared/MangoMesa/Day/tiles_overworld.png"
+            }
+        },
+        {
+            "name": "Starfruit Supernova",
+            "description": "Expert Lobby [The Nest]",
+            "color": "#ff87eb",
+            "background": "./ExpertLobby/background.json",
+            "music": "./ExpertLobby/StarfruitSupernovaLoop.ogg",
+            "theme": "~/Shared/StarfruitSupernova/theme.json",
+            "music_start": 22.949,
+            "filters": {
+                "AdvancedBloomFilter": {
+                    "threshold": 0.8,
+                    "blur": 5,
+                    "quality": 10,
+                    "bloomScale": 0.1
+                },
+                "AdjustmentFilter": {
+                    "gamma": 1.1
+                }
+            },
+            "textures": {
+                "tiles_overworld.png": "~/Shared/StarfruitSupernova/tiles_overworld.png"
+            }
+        },
+        {
+            "name": "Passionfruit Pantheon",
+            "description": "Grandmaster Lobby [The Nest]",
+            "color": "#fde9a8",
+            "background": "./GrandmasterLobby/background.json",
+            "music": "./GrandmasterLobby/PassionfruitPantheonLoop.ogg",
+            "music_start": 4.157,
+            "theme": "~/Shared/PassionfruitPantheon/theme.json",
+            "filters": {
+                "AdvancedBloomFilter": {
+                    "threshold": 0.8,
+                    "blur": 10,
+                    "quality": 20,
+                    "bloomScale": 0.15
+                }
+            },
+            "textures": {
+                "tiles_overworld.png": "~/Shared/PassionfruitPantheon/Day/tiles_overworld.png"
+            }
+        }
+    ]
+}

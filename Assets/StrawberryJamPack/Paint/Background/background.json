@@ -1,0 +1,25 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./midclouds.png",
+            "tile": "x",
+            "mx": 1,
+            "mt": 0.5
+        },
+        {
+            "path": "./bigclouds.png"
+        },
+        {
+            "path": "./bgclouds.png",
+            "tile": "x",
+            "mx": 1,
+            "mt": 0.75
+        },
+        {
+            "path": "./bg.png"
+        }
+    ]
+}

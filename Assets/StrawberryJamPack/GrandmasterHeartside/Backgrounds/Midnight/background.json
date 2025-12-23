@@ -1,0 +1,50 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./cloud-loop-1.png",
+            "tile": "x",
+            "px": 0.1
+        },
+        {
+            "path": "./mountains.png",
+            "tile": "x",
+            "px": 0.075,
+            "y": 50
+        },
+        {
+            "path": "./cloud-loop-2.png",
+            "tile": "x",
+            "px": 0.05,
+            "y": 100
+        },
+        {
+            "path": "./cloud-loop-3.png",
+            "tile": "x",
+            "px": 0.025,
+            "y": 100
+        },
+        {
+            "path": "./cloud-loop-4.png",
+            "tile": "x",
+            "mx": 1,
+            "mt": 0.5,
+            "px": 0.02,
+            "y": -50
+        },
+        {
+            "path": "./moon.png"
+        },
+        {
+            "path": "starsloop.png",
+            "tile": "xy",
+            "px": 0.01,
+            "py": 0.005
+        },
+        {
+            "path": "./background.png"
+        }
+    ]
+}

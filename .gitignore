@@ -1,0 +1,6 @@
+/cache/
+/BrowserPersistentData/
+/node_modules/
+/.venv/
+buildToProd.py
+.idea/

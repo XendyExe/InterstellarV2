@@ -1,0 +1,31 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./fgtrees.png",
+            "tile": "x",
+            "px": 0.1
+        },
+        {
+            "path": "./mghills.png",
+            "tile": "x",
+            "px": 0.05
+        },
+        {
+            "path": "./bghills.png",
+            "tile": "x",
+            "px": 0.025
+        },
+        {
+            "path": "./sunglare1.png"
+        },
+        {
+            "path": "./sun.png"
+        },
+        {
+            "path": "./background.png"
+        }
+    ]
+}

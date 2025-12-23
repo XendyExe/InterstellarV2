@@ -1,0 +1,47 @@
+{
+    "name": "Mango Mesa Heartside",
+    "description": "Lawful - Advanced Heartside [Sparrow]",
+    "color": "#e8be94",
+    "cycle_style": [0, 0, 1, 2, 3, 3, 2, 1],
+    "cycle_time": 60,
+    "smooth_transition": true,
+    "music": "./MangoMesaHeartsideLoop.ogg",
+    "music_start": 0.607,
+    "filters": {
+        "AdvancedBloomFilter": {
+            "threshold": 0.9,
+            "blur": 10,
+            "quality": 20,
+            "bloomScale": 0.1
+        },
+        "AdjustmentFilter": {
+            "gamma": 1.05
+        }
+    },
+    "subzones": [
+        {
+            "background": "./Backgrounds/Day/background.json",
+            "textures": {
+                "tiles_overworld.png": "~/Shared/MangoMesa/Day/tiles_overworld.png"
+            }
+        },
+        {
+            "background": "./Backgrounds/Transition/background.json",
+            "textures": {
+                "tiles_overworld.png": "~/Shared/MangoMesa/Transition/tiles_overworld.png"
+            }
+        },
+        {
+            "background": "./Backgrounds/Night/background.json",
+            "textures": {
+                "tiles_overworld.png": "~/Shared/MangoMesa/Night/tiles_overworld.png"
+            }
+        },
+        {
+            "background": "./Backgrounds/Midnight/background.json",
+            "textures": {
+                "tiles_overworld.png": "~/Shared/MangoMesa/Midnight/tiles_overworld.png"
+            }
+        }
+    ]
+}

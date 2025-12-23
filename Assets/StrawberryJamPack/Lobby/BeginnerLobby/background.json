@@ -1,0 +1,26 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./40loopislands.png",
+            "tile": "x",
+            "px": 0.05
+        },
+        {
+            "path": "./30loopwater.png",
+            "tile": "x",
+            "mx": 1,
+            "mt": 0.2
+        },
+        {
+            "path": "./20loopclouds.png",
+            "tile": "x",
+            "px": 0.025
+        },
+        {
+            "path": "./staticbackground.png"
+        }
+    ]
+}

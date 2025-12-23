@@ -1,0 +1,30 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./foregroundloop.png",
+            "tile": "x",
+            "px": 0.1
+        },
+        {
+            "path": "./mountains.png",
+            "tile": "x",
+            "px": 0.05
+        },
+        {
+            "path": "./cloudsloop.png",
+            "tile": "x",
+            "px": 0.025,
+            "mx": 1,
+            "mt": 0.5
+        },
+        {
+            "path": "./skyloop.png",
+            "tile": "x",
+            "mx": 1,
+            "mt": 1
+        }
+    ]
+}

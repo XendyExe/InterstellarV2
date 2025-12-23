@@ -1,0 +1,34 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./foreground.png",
+            "tile": "x",
+            "px": 0.1
+        },
+        {
+            "path": "./mountains.png"
+        },
+        {
+            "path": "./clouds1loop.png",
+            "tile": "x",
+            "px": 0.05
+        },
+        {
+            "path": "./clouds2loop.png",
+            "tile": "x",
+            "px": 0.025
+        },
+        {
+            "path": "./clouds3loop.png",
+            "tile": "x",
+            "mx": 1,
+            "mt": 0.5
+        },
+        {
+            "path": "./background.png"
+        }
+    ]
+}
