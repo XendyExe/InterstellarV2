@@ -189,6 +189,7 @@ class StellarCommandsManager {
         this.registeredCommands.push(new DrednotCommand("lockdown", ["lock"], false, [new IntArgument("ticks")], true))
         this.registeredCommands.push(new DrednotCommand("warp", [], false, [new OptionsArgument("arg", ["", "cancel"])]))
         this.registeredCommands.push(new DrednotCommand("mosaic3783", ["mosaic"], false, [], true))
+        this.registeredCommands.push(new DrednotCommand("skip", [], false, [], true))
         
         this.registeredCommands.push(new DrednotCommand("ban", [], false, [new PlayerArgument("player")], true))
         this.registeredCommands.push(new DrednotCommand("kick", [], false, [new PlayerArgument("player")], true))
