@@ -109,9 +109,6 @@ class Interstellar {
     }
     // Called when internal is loaded
     async loaded() {
-        if (getComputedStyle(document.querySelector("#top-bar")!!).animation == '0.7s ease 0s 1 normal none running slideTopBarIn') {
-            alert("You seem to be using Shrekdark, which is not supported. Please disable that extension to use Interstellar! If this is incorrect, please create a bug report in the Interstellar server.\n\nShrekdark will produce a massive rectangle in the middle of your screen.")
-        }
         StellarAPI.Packet = new InterstellarPacketAPI();
         StellarAPI.DrednotSettings = new InterstellarDrednotSettingsAPI();
         loadTransitionSfx();

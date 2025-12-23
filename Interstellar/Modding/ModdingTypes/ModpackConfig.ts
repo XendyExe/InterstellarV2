@@ -7,7 +7,6 @@ export default interface ModpackConfig {
     audio?: Record<string, string>,
     menu?: string[],
     font?: string,
-    font_name?: string,
     non_interstellar?: boolean,
     icon?: string
     texture_pack?: boolean

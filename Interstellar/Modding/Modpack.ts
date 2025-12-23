@@ -45,7 +45,7 @@ export class Modpack {
             }
         }
         if (this.config.font) {
-            let name = this.config.font_name ?? "interstellarFont";
+            let name = "interstellarFont";
             let path = parsePath(this.config.font, "");
             if (nonvalidation) Interstellar.font = new FontFace(name, `url(${this.getFileURL(path)})`);
         }
