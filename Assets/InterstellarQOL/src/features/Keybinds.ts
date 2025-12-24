@@ -70,6 +70,14 @@ const blacklistedKeys = [
     "ShiftLeft", "ShiftRight", "AltLeft", "AltRight", "ControlLeft", "ControlRight"
 ]
 class Keybinds {
+    EMPTY_KEYBIND = {
+                    disabled: false,
+                    shift: false,
+                    control: false,
+                    alt: false,
+                    key: "None",
+                    command: "CHANGE ME"
+                }
     keybinds: Keybind[] = DEFAULT_KEYBINDS;
 
     settingCommand: Keybind | null = null;
@@ -141,7 +149,7 @@ class Keybinds {
         this.settingCommand = data;
     }
     save() {
-        const copy = [...this.keybinds].filter(k => k.command != "CHANGE ME");
+        const copy = [...this.keybinds].filter(k => k.command != "CHANGE ME" );
         localStorage.setItem("isqol-keybinds", JSON.stringify(copy));
     }
 }

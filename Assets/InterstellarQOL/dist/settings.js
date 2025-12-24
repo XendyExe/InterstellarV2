@@ -10,6 +10,7 @@ const StellarAPI_1 = __importDefault(require("@interstellar/StellarAPI"));
 const preact_1 = require("preact");
 const Autoequip_1 = __importDefault(require("./features/Autoequip"));
 const Keybinds_1 = __importDefault(require("./features/Keybinds"));
+let shouldReload = false;
 class KeybindsComponent extends preact_1.Component {
     keybindsEntry(props) {
         const data = props.data;
@@ -29,10 +30,20 @@ class KeybindsComponent extends preact_1.Component {
                         Keybinds_1.default.editCommand(e.target, data);
                     } },
                     "/",
-                    data.command)));
+                    data.command)),
+            (0, preact_1.h)("th", null,
+                (0, preact_1.h)("button", { class: "btn-red", onClick: () => {
+                        Keybinds_1.default.keybinds.splice(props.index, 1);
+                        Keybinds_1.default.save();
+                        StellarAPI_1.default.UI.toggleUI("");
+                        StellarAPI_1.default.UI.toggleUI("isqol-keybinds");
+                    } }, "X")));
     }
     render() {
-        Keybinds_1.default.load();
+        if (!shouldReload) {
+            Keybinds_1.default.load();
+        }
+        shouldReload = false;
         return (0, preact_1.h)("div", { class: "window darker" },
             (0, preact_1.h)("div", { class: "close" },
                 (0, preact_1.h)("button", { class: "btn-red", onClick: () => { Keybinds_1.default.closeMenu(); StellarAPI_1.default.UI.toggleUI(); } }, "Close")),
@@ -40,15 +51,9 @@ class KeybindsComponent extends preact_1.Component {
             (0, preact_1.h)("p", null, "Keybinds allows you to run any command by holding down some combination of keys. Interstellar adds many custom commands."),
             (0, preact_1.h)("p", null, "Click the keys/commands to edit them."),
             (0, preact_1.h)("button", { onClick: () => {
-                    Keybinds_1.default.keybinds.push({
-                        disabled: false,
-                        shift: false,
-                        control: false,
-                        alt: false,
-                        key: "None",
-                        command: "CHANGE ME"
-                    });
+                    Keybinds_1.default.keybinds.push(Keybinds_1.default.EMPTY_KEYBIND);
                     // This is really dumb
+                    shouldReload = true;
                     StellarAPI_1.default.UI.toggleUI("");
                     StellarAPI_1.default.UI.toggleUI("isqol-keybinds");
                 } }, "Add Keybind"),
@@ -61,9 +66,10 @@ class KeybindsComponent extends preact_1.Component {
                     (0, preact_1.h)("th", null, "Alt?"),
                     (0, preact_1.h)("th", null, "Shift?"),
                     (0, preact_1.h)("th", null, "Key"),
-                    (0, preact_1.h)("th", null, "Command")),
-                ...Object.values(Keybinds_1.default.keybinds).map((elm) => {
-                    return (0, preact_1.h)(this.keybindsEntry, { data: elm });
+                    (0, preact_1.h)("th", null, "Command"),
+                    (0, preact_1.h)("th", null, "Del")),
+                ...Object.values(Keybinds_1.default.keybinds).map((elm, index) => {
+                    return (0, preact_1.h)(this.keybindsEntry, { data: elm, index: index });
                 })));
     }
     constructor() {

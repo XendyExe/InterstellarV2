@@ -22,7 +22,9 @@ import { revealInterstellarExports } from "./API/APILinker";
 import StellarEventManager from "./API/StellarEventManager";
 import { TriggerEvent } from "./API/InterstellarEvents";
 import UIEventDispatcher from "./Patching/UIEventDispatcher";
-import StellarCommandsManager from "./API/StellarCommandsManager"; StellarCommandsManager;
+import StellarCommandsManager from "./API/StellarCommandsManager";import ModpackImporter from "./Modding/ModpackImporter";
+import Devpack from "./API/Devpack";
+ StellarCommandsManager;
 
 interface Graphics {
     game: Container,
@@ -65,6 +67,7 @@ class Interstellar {
     isFirefox: boolean = false;
 
     scriptingMods: Record<string, InterstellarScriptingMod> = {};
+    url = localStorage.getItem("interstellar-extension-url") ?? ""
 
     isTestDred = location.hostname == "test.drednot.io"
     connectServer = -1;
@@ -147,6 +150,17 @@ class Interstellar {
                     delete AssetManager.internal!["InterstellarQOL/" + path];
                 }
                 PerformanceMetrics.split("Preloaded [RP] Interstellar QOL");
+            } else if (modid == "interstellar.devpack") {
+                try {
+                    await Devpack.load();
+                    this.loadedModpacks.push(Devpack.modpack!!);
+                } catch (e) {
+                    brokenMods.push("interstellar.devpack");
+                    console.error(e);
+                    setTimeout(() => {
+                        StellarAPI.UI.showPrompt("Failed to load devpack", `Failed to load devpack: ${e}\nThe mod has been disabled for you.`, () => {})
+                    }, 1000);
+                }
             } else {
                 if (!StellarAssetManager.database!!.objectStoreNames.contains(modid)) {
                     brokenMods.push(modid);
@@ -268,6 +282,31 @@ class Interstellar {
 
     sendChatLog(message: string) {
         StellarAPI.UI.writeChat(`<b>[<span style="color: #ff7aac">Interstellar</span>]:&nbsp;</b>${message}`)
+    }
+
+    tryImport(e: any) {
+        // This is blatently stolen from drednot.
+        try {
+            let t = e.webkitGetAsEntry();
+            if (t != null) {
+                if (t.isDirectory) {
+                    StellarAPI.UI.showPrompt("Import Pack?", `Do you want to import the directory '${t.name}' as a modpack?`, () => {
+                        this.modpackManager.open();
+                        ModpackImporter.importDirectory(t);
+                    })
+                    return true
+                }
+            }
+        } catch (l) {}
+        let s = e.getAsFile();
+        if (s != null && (s.type == "application/x-zip-compressed" || s.type == "application/zip")) {
+            StellarAPI.UI.showPrompt("Import Pack?", `Do you want to import the archive '${s.name}' as a modpack?`, async () => {
+                this.modpackManager.open();
+                ModpackImporter.importZip(s);
+            });
+            return true
+        }
+        return false
     }
 }
 export default new Interstellar();

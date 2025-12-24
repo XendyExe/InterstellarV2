@@ -110,6 +110,21 @@ export class DrednotCommand extends BaseCommand {
 
     execute(...args: string[]) {
         const command = "/" + this.name + " " + args.join(" ");
+        console.log("executing drednot command", `"${command}"`);
+        return command.trim();
+    }
+}
+
+export class WarpCommand extends BaseCommand {
+    name = "warp";
+    alias = [];
+    testOnly = false;
+    requireCaptain = false;
+    arguments = [new OptionsArgument("option", ["", "cancel", "reset"])];
+
+    execute(arg: string) {
+        if (arg == "cancel") arg = "reset"; 
+        const command = "/" + this.name + " " + arg;
         return command.trim();
     }
 }
@@ -187,7 +202,7 @@ class StellarCommandsManager {
         this.registeredCommands.push(new DrednotCommand("save", [], false, [], true))
         this.registeredCommands.push(new DrednotCommand("loader_cycle_time", [], false, [new IntArgument("ticks")], true))
         this.registeredCommands.push(new DrednotCommand("lockdown", ["lock"], false, [new IntArgument("ticks")], true))
-        this.registeredCommands.push(new DrednotCommand("warp", [], false, [new OptionsArgument("arg", ["", "cancel"])]))
+        this.registeredCommands.push(new WarpCommand());
         this.registeredCommands.push(new DrednotCommand("mosaic3783", ["mosaic"], false, [], true))
         this.registeredCommands.push(new DrednotCommand("skip", [], false, [], true))
         

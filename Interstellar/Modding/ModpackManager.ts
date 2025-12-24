@@ -1,3 +1,4 @@
+import Devpack from "../API/Devpack";
 import Interstellar from "../Interstellar";
 import { InterstellarLoadingScreen } from "../InterstellarLoadingScreen";
 import StellarAssetManager, { AssetStoreData, internalModpackName } from "../StellarAssetManager";
@@ -74,7 +75,7 @@ export class ModpackManager {
 
 
     constructor() {
-
+        window.addEventListener("resize", this.resize.bind(this));
     }
 
     getEnabledModNames(): string[] {
@@ -160,6 +161,9 @@ export class ModpackManager {
                 this.processModConfig(store, storeName, JSON.parse(await store["interstellar.json"]!.blob.text()), mods)
             }
         }
+
+        const internalManifest = await Devpack.getManifest();
+        if (internalManifest != null) mods.push(internalManifest);
         
         let disabledMods = [];
         for (let mod of mods) {
@@ -178,6 +182,14 @@ export class ModpackManager {
         }
         this.updateUI();
     }
+
+    resize() {
+        if (this.container) {
+            let s = Math.min(window.innerWidth/1200, window.innerHeight / 900, 1);
+            this.container.style.scale = "" + s;
+        }
+    }
+
     async open() {
         // @ts-ignore
         window.toggleUI();
@@ -189,11 +201,24 @@ export class ModpackManager {
         this.update.length = 0;
 
         this.container = document.createElement("div");
-        document.querySelector("#window-container")!.appendChild(this.container);
+        this.resize();
+        document.body.appendChild(this.container);
         this.container.classList.add("dark");
         this.container.classList.add("window");
         this.container.classList.add("IS-modcontainer");
-        this.container.innerHTML = `<div class="close"><button class="btn-blue" id="IS_MODPACK_SAVE">Save</button><button class="btn-red" id="IS_MODPACK_CLOSE">Close</button></div><h2>Mod Management</h2><p>Use this menu to specify what order to load mods in. Mods at the top are given higher priority (will override mods below if there is conflict). Click on the mod titles to see more information + management.</p><input id="IS-mod-upload-input" type="file" accept=".zip,application/zip" />`;
+        this.container.innerHTML = `
+        <div class="close">
+            <button class="btn-blue" id="IS_MODPACK_SAVE">Save</button>
+            <button class="btn-red" id="IS_MODPACK_CLOSE">Close</button>
+        </div>
+        <h2>Mod Management</h2>
+        <div>
+            Use this menu to specify what order to load mods in. Mods at the top are given higher priority 
+            (will override mods below if there is conflict). Click on the mod titles to see more information + management.
+            You can drag zip files or directories onto the game to load them, or click the button below:
+        </div>
+        <div>ZIP modpack import: <input id="IS-mod-upload-input" type="file" accept=".zip,application/zip" /></div>
+        `;
 
         const wrapper = document.createElement("div");
         wrapper.classList.add("IS-modwrapper");

@@ -9,20 +9,19 @@ export async function loadScriptingMod(mod: Modpack): Promise<InterstellarScript
     const modid = mod.config.id;
     const scriptingType = mod.config.scripting!!.toLowerCase();
     const entrypoint = mod.config.entrypoint!!
-    const files = mod.files;
 
-    if (scriptingType == "commonjs") return await loadCommonJSMod(modid, entrypoint, files);
+    if (scriptingType == "commonjs") return await loadCommonJSMod(modid, entrypoint, mod);
     else throw `Unrecognized scripting type "${scriptingType}" when loading ${mod.config.id} (${mod.config.name})`
 }
 
 
 // CommonJS scripting importing
-async function loadCommonJSMod(modid: string, entrypoint: string, files: Record<string, BlobContainer>): Promise<InterstellarScriptingMod> {
+async function loadCommonJSMod(modid: string, entrypoint: string, mod: Modpack): Promise<InterstellarScriptingMod> {
     entrypoint = parsePath(entrypoint, "");
-    const importQueue = await getCommonJS(modid, entrypoint, files);
+    const importQueue = await getCommonJS(modid, entrypoint, mod);
     while (importQueue.length > 0) {
         let path = importQueue.shift()!!;
-        (await getCommonJS(modid, path, files)).forEach((link) => {
+        (await getCommonJS(modid, path, mod)).forEach((link) => {
             if (!scriptingModFunctions[modid + "/" + link] && !importQueue.includes(link)) {
                 importQueue.push(link);
             }
@@ -33,10 +32,10 @@ async function loadCommonJSMod(modid: string, entrypoint: string, files: Record<
     return Interstellar.scriptingMods[modid] = new entrypointModule.default();
 }
 const commonjsregex = /require\((["'`])(.*?)["'`]\)/gm
-async function getCommonJS(modid: string, path: string, files: Record<string, BlobContainer>): Promise<string[]> {
-    const jsFile = await files[path];
+async function getCommonJS(modid: string, path: string, mod: Modpack): Promise<string[]> {
+    const jsFile = await mod.getFile(path);
     if (!jsFile) throw `Failed to find js file ${path}`
-    let js = await jsFile.blob.text();
+    let js: string = await jsFile.blob.text();
     const linked: string[] = []
     js = js.replaceAll(commonjsregex, (match, quote, module) => {
         if (

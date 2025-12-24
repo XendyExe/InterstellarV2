@@ -15,7 +15,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "modloader.js"
+        "modloader.js",
+        "moddev/*"
       ],
       "matches": ["https://*.drednot.io/*"]
     }

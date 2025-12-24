@@ -19,6 +19,7 @@ shipyard = "Shipyard"
 inventory = "InventoryManager"
 htmluifunctions = "HTMLUIFunctions"
 msgpack = "msgpack"
+modfiledatabase = "ModFileDatabase"
 
 source_map = {
     "ErrorLogger": ["reportError:"],
@@ -77,7 +78,7 @@ source_map = {
     "CookieManager": ['getCookiePrefix:'],
     "Hostname": ['"getHostName"'],
     "LoginButtons": ['"renderLoginButtons"'],
-    "ModFileDatabase": ['"modFileDB"'],
+    modfiledatabase: ['"modFileDB"'],
     "AdManager": ["initAds:"],
     "ServerOption": ['"ServerOption"'],
     "LOCATION_WASM": ["exports.default", ".wasm", "/x/"],

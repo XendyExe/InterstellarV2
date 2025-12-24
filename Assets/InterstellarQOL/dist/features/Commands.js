@@ -255,6 +255,18 @@ class ChangeFireModeCommand extends StellarCommandsManager_1.BaseCommand {
         }
     }
 }
+class GetOnlinePlayersCommand extends StellarCommandsManager_1.BaseCommand {
+    constructor() {
+        super(...arguments);
+        this.name = "onlinelist";
+        this.alias = [];
+        this.testOnly = false;
+        this.arguments = [];
+    }
+    execute() {
+        __1.default.logMessage("Online players: " + StellarAPI_1.default.Game.getLocalOnlinePlayerNames().join(", "));
+    }
+}
 function registerCommands() {
     StellarCommandsManager_1.default.registerCommand(new GravityCommand());
     StellarCommandsManager_1.default.registerCommand(new LeaveCommand());
@@ -269,4 +281,5 @@ function registerCommands() {
     StellarCommandsManager_1.default.registerCommand(new CrewCommand());
     StellarCommandsManager_1.default.registerCommand(new CapCommand());
     StellarCommandsManager_1.default.registerCommand(new ChangeFireModeCommand());
+    StellarCommandsManager_1.default.registerCommand(new GetOnlinePlayersCommand());
 }

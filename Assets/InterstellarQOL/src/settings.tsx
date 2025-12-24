@@ -4,7 +4,7 @@ import { h, Fragment, Component, Attributes, ComponentChildren, Ref } from "prea
 import Autoequip, { EquipmentSlot } from "./features/Autoequip";
 import Keybinds, { Keybind } from "./features/Keybinds";
 
-
+let shouldReload = false;
 class KeybindsComponent extends Component {
     keybindsEntry(props: any) {
         const data: Keybind = props.data;
@@ -18,10 +18,19 @@ class KeybindsComponent extends Component {
             <th><a onClick={(e) => {
                 Keybinds.editCommand(e.target as HTMLAnchorElement, data);
             }}>/{data.command}</a></th>
+            <th><button class="btn-red" onClick={() => {
+                Keybinds.keybinds.splice(props.index, 1);
+                Keybinds.save();
+                StellarAPI.UI.toggleUI("");
+                StellarAPI.UI.toggleUI("isqol-keybinds");
+            }}>X</button></th>
         </tr>
     }
     render(): ComponentChildren {
-        Keybinds.load();
+        if (!shouldReload) {
+            Keybinds.load();
+        }
+        shouldReload = false;
         return <div class="window darker">
             <div class="close">
                 <button class="btn-red" onClick={() => {Keybinds.closeMenu();StellarAPI.UI.toggleUI()}}>Close</button>
@@ -30,15 +39,9 @@ class KeybindsComponent extends Component {
             <p>Keybinds allows you to run any command by holding down some combination of keys. Interstellar adds many custom commands.</p>
             <p>Click the keys/commands to edit them.</p>
             <button onClick={() => {
-                Keybinds.keybinds.push({
-                    disabled: false,
-                    shift: false,
-                    control: false,
-                    alt: false,
-                    key: "None",
-                    command: "CHANGE ME"
-                })
+                Keybinds.keybinds.push(Keybinds.EMPTY_KEYBIND);
                 // This is really dumb
+                shouldReload = true;
                 StellarAPI.UI.toggleUI("");
                 StellarAPI.UI.toggleUI("isqol-keybinds");
             }}>Add Keybind</button>
@@ -52,9 +55,10 @@ class KeybindsComponent extends Component {
                     <th>Shift?</th>
                     <th>Key</th>
                     <th>Command</th>
+                    <th>Del</th>
                 </tr>
-                {...Object.values(Keybinds.keybinds).map((elm) => {
-                    return <this.keybindsEntry data={elm}/>
+                {...Object.values(Keybinds.keybinds).map((elm, index) => {
+                    return <this.keybindsEntry data={elm} index={index}/>
                 })}
             </table>
         </div>

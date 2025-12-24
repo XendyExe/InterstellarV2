@@ -192,6 +192,16 @@ class ChangeFireModeCommand extends BaseCommand {
     }
 }
 
+class GetOnlinePlayersCommand extends BaseCommand {
+    name = "onlinelist"
+    alias = []
+    testOnly = false;
+    arguments = []
+    execute() {
+        InterstellarQOL.logMessage("Online players: " + StellarAPI.Game.getLocalOnlinePlayerNames().join(", "))
+    } 
+}
+
 export function registerCommands() {
     StellarCommandManager.registerCommand(new GravityCommand());
     StellarCommandManager.registerCommand(new LeaveCommand());
@@ -206,4 +216,5 @@ export function registerCommands() {
     StellarCommandManager.registerCommand(new CrewCommand());
     StellarCommandManager.registerCommand(new CapCommand());
     StellarCommandManager.registerCommand(new ChangeFireModeCommand());
+    StellarCommandManager.registerCommand(new GetOnlinePlayersCommand());
 }

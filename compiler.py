@@ -17,11 +17,10 @@ pixi_filters_regex = re.compile(r"const\s+?(.*?)\s*?=\s*?require\(\"pixi-filters
 
 OBFUSCATE = False
 
-def compile_drednot(name, forceObfuscate=False):
+def compile_drednot(name, path, forceObfuscate=False):
     global OBFUSCATE
     if forceObfuscate:
         OBFUSCATE = True
-    path = "cache/prod/"
     with open(path + "index.html", "r", encoding="utf-8") as reader:
         index_html = reader.read()
     with open(path + "index.css", "r", encoding="utf-8") as reader:

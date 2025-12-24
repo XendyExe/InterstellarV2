@@ -1,6 +1,7 @@
 import musicPlayer, { MusicCache } from "./MusicPlayer";
 import StellarAssetManager from "../StellarAssetManager";
 import { InterstellarLoadingScreen } from "../InterstellarLoadingScreen";
+import Devpack from "../API/Devpack";
 const CHUNK_LENGTH = 5; // seconds
 const CHUNK_SAMPLE_LENGTH = 48000 * CHUNK_LENGTH;
 function floatTo16BitPCM(float32Array: Float32Array): Int16Array {
@@ -76,14 +77,19 @@ export class Music {
     }
     async load(loading: InterstellarLoadingScreen) {
         if (!musicPlayer.musicCache[this.hash]) {
+            let blob: Blob;
             loading.setDescription(`Reading ${this.name}...`)
-            const transaction = StellarAssetManager.database!!.transaction(this.assetStore, "readonly");
-            const store = transaction.objectStore(this.assetStore);
-            const blob: Blob = await new Promise((resolve, reject) => {
+            if (this.assetStore != "interstellar.devpack") {
+                const transaction = StellarAssetManager.database!!.transaction(this.assetStore, "readonly");
+                const store = transaction.objectStore(this.assetStore);
+                blob = await new Promise((resolve, reject) => {
                 const request = store.get(this.path);
-                request.onerror = reject;
-                request.onsuccess = (e) => { resolve(request.result.blob) }
-            });
+                    request.onerror = reject;
+                    request.onsuccess = (e) => { resolve(request.result.blob) }
+                });
+            } else {
+                blob = (await Devpack.getFile(this.path)).blob;
+            }
             loading.setDescription(`Splitting ${this.name}...`)
             const buffer = await musicPlayer.audioContext.decodeAudioData(await blob.arrayBuffer());
             const leftF32 = floatTo16BitPCM(buffer.getChannelData(0));

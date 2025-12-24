@@ -73,6 +73,14 @@ const blacklistedKeys = [
 ];
 class Keybinds {
     constructor() {
+        this.EMPTY_KEYBIND = {
+            disabled: false,
+            shift: false,
+            control: false,
+            alt: false,
+            key: "None",
+            command: "CHANGE ME"
+        };
         this.keybinds = exports.DEFAULT_KEYBINDS;
         this.settingCommand = null;
         this.settingKey = null;

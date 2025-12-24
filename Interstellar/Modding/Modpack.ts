@@ -19,35 +19,38 @@ export class Modpack {
     // @ts-ignore
     config: ModpackConfig;
     // @ts-ignore
-    files: Record<string, BlobContainer>;
     urlCache: Record<string, string> = {};
     scripting: InterstellarScriptingMod | undefined
-    constructor() {
-
-    }
+    // @ts-ignore
+    getFile: Function;
+    // @ts-ignore
+    cleanFiles: Function;
     // Inits and prepatches things that needs to be patched
-    async init(flattened: Record<string, BlobContainer>, internal: boolean, nonvalidation=true): Promise<Modpack> {
-        if (!flattened["interstellar.json"]) {
-            console.log(flattened);
-            throw "Modpack is missing init json"
-        }
-        this.config = JSON.parse(await flattened["interstellar.json"]?.blob.text());
-        this.files = flattened;
+    devpack: boolean = false;
+    async initdevpack(getFilesFunction: Function, internal: boolean, cleanFilesFunction: Function, nonvalidation=true) {
+        this.devpack = true;
+        return await this.init(getFilesFunction, internal, cleanFilesFunction, nonvalidation);
+    }
+
+    async init(getFilesFunction: Function, internal: boolean, cleanFilesFunction: Function, nonvalidation=true): Promise<Modpack> {
+        this.getFile = getFilesFunction;
+        this.cleanFiles = cleanFilesFunction;
+        this.config = JSON.parse(await (await this.getFile("interstellar.json"))!!.blob.text());
+        if (this.devpack) this.config.id = "interstellar.devpack";
         console.log("Preloading modpack", this.config!!.name);
-        if (this.config.id == "internal") throw "Modpack id cannot be \"internal\"";
         if (this.config.id.trim().startsWith("interstellar.") && !internal) throw "Modpack id cannot start with \"interstellar.\"";
         if (this.config.audio) {
             for (const [audio, path] of Object.entries(this.config.audio)) {
                 const loc = parsePath(path, "");
-                const blob = this.files[loc];
+                const blob = await this.getFile(loc);
                 if (!blob) throw `Failed to find audio file location ${path} -> ${loc}`
-                Interstellar.patcher.audioOverrides[audio] = this.getFileURL(loc);
+                Interstellar.patcher.audioOverrides[audio] = await this.getFileURL(loc);
             }
         }
         if (this.config.font) {
             let name = "interstellarFont";
             let path = parsePath(this.config.font, "");
-            if (nonvalidation) Interstellar.font = new FontFace(name, `url(${this.getFileURL(path)})`);
+            if (nonvalidation) Interstellar.font = new FontFace(name, `url(${await this.getFileURL(path)})`);
         }
 
         if (this.config.scripting && nonvalidation) {
@@ -61,9 +64,7 @@ export class Modpack {
         if (this.scripting) await this.scripting.load();
 
         if (this.config.zones) await this.loadZones(textureCache, nonvalidation);
-        for (let key of Object.keys(this.files)) {
-            delete this.files[key];
-        }
+        await this.cleanFiles();
         console.log("Unloaded assets from " + this.config.id);
     }
 
@@ -81,7 +82,7 @@ export class Modpack {
             let configMusic: Music | null = null;
             if (config.music) {
                 let path = parsePathFromFile(config.music, configPath);
-                let file = this.files[path]!!;
+                let file = await this.getFile(path)!!;
                 if (!file) throw `Failed to get music from ${path}`;
                 configMusic = new Music(this.config.id + "/" + path, file.hash, config.music_start ?? 0);
             }
@@ -93,11 +94,11 @@ export class Modpack {
                 let themeRaw = subzoneConfig.theme ?? config.theme ?? {};
                 let theme = {};
                 if (typeof themeRaw == "string") {
-                    theme = JSON.parse(await this.files[parsePathFromFile(themeRaw, configPath)]!.blob.text())
+                    theme = JSON.parse(await (await this.getFile(parsePathFromFile(themeRaw, configPath)))!.blob.text())
                 } else theme = themeRaw;
                 if (subzoneConfig.music) {
                     let musicPath = parsePathFromFile(subzoneConfig.music, configPath);
-                    let musicFile = this.files[parsePathFromFile(subzoneConfig.music, configPath)]!!;
+                    let musicFile = await this.getFile(parsePathFromFile(subzoneConfig.music, configPath))!!;
                     if (!musicFile) throw `Failed to get music from ${musicPath}`;
                     music = new Music(this.config.id + "/" + musicPath, musicFile.hash, subzoneConfig.music_start ?? config.music_start ?? 0);
                 }
@@ -117,25 +118,25 @@ export class Modpack {
                 for (const sprite of bgConfig.sprites) {
                     if (sprite.path) {
                         const _path = parsePathFromFile(sprite.path, bgConfigPathRaw);
-                        let file = this.files[_path];
+                        let file = await this.getFile(_path);
                         if (!file) throw `Failed to find file ${_path}`;
                         background.addSprite(sprite, file.blob);
                     } 
                     else if (sprite.animated) {
                         if (sprite.animated.sprites) {
                             let blobs: Blob[] = [];
-                            sprite.animated.sprites.forEach(elm => {
+                            for (const elm of sprite.animated.sprites) {
                                 const _path = parsePathFromFile(elm, bgConfigPathRaw);
-                                let file = this.files[_path];
+                                let file = await this.getFile(_path);
                                 if (!file) throw `Failed to find file ${_path}`;
                                 blobs.push(file.blob)
-                            });
+                            }
                             background.addAnimatedSprites(sprite, blobs);
                         } else if (sprite.animated.spritesheet) {
                             const _blobpath = parsePathFromFile(sprite.animated.spritesheet.image, bgConfigPathRaw);
                             const _jsonpath = parsePathFromFile(sprite.animated.spritesheet.json, bgConfigPathRaw);
-                            const _blobfile = this.files[_blobpath];
-                            const _jsonfile = this.files[_jsonpath];
+                            const _blobfile = await this.getFile(_blobpath);
+                            const _jsonfile = await this.getFile(_jsonpath);
                             if (!_blobfile) throw `Failed to find spritesheet image ${_blobpath}`;
                             if (!_jsonfile) throw `Failed to find spritesheet image ${_jsonpath}`;
                             let blob = _blobfile.blob;
@@ -176,8 +177,8 @@ export class Modpack {
 
                 for (let [override, path] of Object.entries(subzone.textures)) {
                     path = parsePathFromFile(path, configPath);
-                    if (!this.files[path]) throw `Failed to find texture at ${path}`;
-                    textures.addTexture(override, this.files[path]!.blob)
+                    if (!await this.getFile(path)) throw `Failed to find texture at ${path}`;
+                    textures.addTexture(override, (await this.getFile(path))!.blob)
                 }
 
                 subzones.push({
@@ -214,17 +215,17 @@ export class Modpack {
         }
     }
     
-    getFileURL(path: string) {
-        const file = this.files[path];
+    async getFileURL(path: string) {
+        const file = await this.getFile(path);
         if (!file) throw `Failed to find file ${path}`
         if (!this.urlCache[path]) this.urlCache[path] = URL.createObjectURL(file.blob);
         return this.urlCache[path];
     }
 
     async readJson(path: string) {
-        if (!this.files[path]) throw `Could not find json at ${path}`;
+        if (!await this.getFile(path)) throw `Could not find json at ${path}`;
         try {
-            return JSON.parse(await this.files[path]!!.blob.text());
+            return JSON.parse(await (await this.getFile(path))!!.blob.text());
         } catch (e) {
             throw `Failed to read json at ${path}:\n${e}`;
         }
@@ -232,5 +233,13 @@ export class Modpack {
 }
 
 export async function createModpack(flattened: Record<string, BlobContainer>, internal: boolean): Promise<Modpack> {
-    return await (new Modpack()).init(flattened, internal);
+    const getFileFunction = async (path: string) => {
+        return flattened[path];
+    }
+    const cleanFilesFunction = async () => {
+        for (let key of Object.keys(flattened)) {
+            delete flattened[key];
+        }
+    }
+    return await (new Modpack()).init(getFileFunction, internal, cleanFilesFunction);
 }

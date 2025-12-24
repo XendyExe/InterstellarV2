@@ -15,5 +15,6 @@ if (loadVanilla) {
     document.documentElement.innerHTML = '';
     const script = document.createElement("script");
     script.src = chrome.runtime.getURL("modloader.js");
+    localStorage.setItem("interstellar-extension-url", chrome.runtime.getURL(""));
     (document.head || document.documentElement).appendChild(script);
 }

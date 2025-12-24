@@ -9,6 +9,69 @@ function stringToHex(str: string) {
     .join("");
 }
 class ModpackImporter {
+    async importDirectory(dir: FileSystemDirectoryEntry) {
+        let loadingScreen = new InterstellarLoadingScreen("Importing mod...", "Reading directory...");
+        let files: [string, File][] = [];
+        await this.readDirectoryRecursive(dir, files, loadingScreen);
+        let flatten: AssetStoreData = {};
+        let start = Date.now();
+        let total = files.length;
+        let count = 0;
+        for (const [fullPath, blob] of files) {
+            loadingScreen.setTitle(`Importing mod (${count}/${total})`)
+            loadingScreen.setDescription(`Unzipping ${blob.name}`)
+            let hash = `${start}.${count}.${total}.${Math.floor(Math.random() * 255)}`
+            let path = fullPath.startsWith("/") ? fullPath.slice(1) : fullPath;
+            flatten[path] = {blob: blob, hash: stringToHex(hash)};
+            count++;
+            loadingScreen.setProgress(count, total);
+        }
+        await this.importModpack(dir.name, flatten, loadingScreen);
+    }
+
+    // This makes me want to explode more.
+    async readDirectoryRecursive(dir: FileSystemDirectoryEntry, result: [string, File][], loadingScreen: InterstellarLoadingScreen) {
+        loadingScreen.setDescription("Loading file entries in " + dir.fullPath)
+        let entries = await this.readDirectoryEntries(dir);
+        for (const fileEntry of entries) {
+            if (fileEntry.name === "__MACOSX" || fileEntry.name === ".DS_Store") continue;
+            if (fileEntry.isDirectory) {
+                await this.readDirectoryRecursive(fileEntry as FileSystemDirectoryEntry, result, loadingScreen)
+            } else {
+                loadingScreen.setDescription("Reading " + fileEntry.fullPath)
+                result.push([fileEntry.fullPath.replaceAll("\\", "/"), await this.getFile(fileEntry as FileSystemFileEntry)])
+            }
+        }
+    }
+    // -w-
+    private getFile(entry: FileSystemFileEntry): Promise<File> {
+        return new Promise((resolve, reject) => {
+            entry.file(resolve, reject);
+        });
+    }
+
+    // This makes me want to explode.
+    async readDirectoryEntries(dir: FileSystemDirectoryEntry): Promise<FileSystemEntry[]> {
+        return new Promise((resolve, reject) => {
+            const reader = dir.createReader();
+            const allEntries: FileSystemEntry[] = [];
+            const readBatch = () => {
+                reader.readEntries(
+                    (entries) => {
+                        if (entries.length === 0) {
+                            resolve(allEntries);
+                        } else {
+                            allEntries.push(...entries);
+                            readBatch();
+                        }
+                    },
+                    reject
+                );
+            };
+            readBatch();
+        });
+    }
+
     async importZip(file: File) {
         await Interstellar.patcher.internalModFileManager.modFileDB.prepareZipLib();
         let loadingScreen = new InterstellarLoadingScreen("Importing mod...", "Unzipping");
@@ -140,7 +203,10 @@ class ModpackImporter {
         loading.setDescription("Validating preload...");
         let validation;
         try {
-            validation = await (new Modpack()).init({...pack}, false, false);
+            const getFileFunction = async (path: string) => {
+                return pack[path];
+            }
+            validation = await (new Modpack()).init(getFileFunction, false, () => {}, false);
         } catch (s) {
             console.log(s);
             loading.complete();

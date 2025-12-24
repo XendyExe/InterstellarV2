@@ -56,7 +56,7 @@ def build_dred():
     GAME_VERSION = f"Interstellar (Starbright) // v2.0.0.{buildCount}"
     patchall.patchall(path, GAME_VERSION)
 
-    result = compiler.compile_drednot("prod")
+    result = compiler.compile_drednot("prod", "cache/prod/")
     print(f"Finished build in {time.time() - start_time} seconds")
     return result
 

@@ -82,6 +82,7 @@ class AssetManager {
     }
 
     async pushAssetStore(name: string, storeData: AssetStoreData) {
+        if (this.database?.objectStoreNames.contains(name)) this.deleteAssetStore(name, "interstellar")
         await this.createAssetStore(name, "interstellar");
         const transaction = this.database!!.transaction(name, "readwrite");
         const store = transaction.objectStore(name);

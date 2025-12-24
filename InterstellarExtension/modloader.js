@@ -9,6 +9,7 @@ const TEST_URL = "https://interstellarassets.xendyexe.workers.dev/test.game";
         localStorage.setItem("interstellarDEV", USE_DEV);
         
         const test = location.hostname === "test.drednot.io";
+        console.log("Running on test:", test);
         const url = USE_DEV ? (test ? DEV_SERVER_TEST : DEV_SERVER_PROD) : (test ? TEST_URL : PRODUCTION_URL);
         
         const resp = await fetch(url, {
