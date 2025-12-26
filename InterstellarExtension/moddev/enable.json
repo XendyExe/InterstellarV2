@@ -1,4 +1,5 @@
 {
-    "READ ME": "Please read the instructions at https://github.com/XendyExe/Interstellar-Devpack before enabling",
+    "READ ME 1": "Please read the instructions at https://github.com/XendyExe/Interstellar-Devpack before enabling if you are planning to do scripting",
+    "READ ME 2": "Otherwise, just set enabled to true, edit your interstellar.json, and you are good to go :3",
     "enabled": false
 }

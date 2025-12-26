@@ -9,7 +9,6 @@ const TEST_URL = "https://interstellarassets.xendyexe.workers.dev/test.game";
         localStorage.setItem("interstellarDEV", USE_DEV);
         
         const test = location.hostname === "test.drednot.io";
-        console.log("Running on test:", test);
         const url = USE_DEV ? (test ? DEV_SERVER_TEST : DEV_SERVER_PROD) : (test ? TEST_URL : PRODUCTION_URL);
         
         const resp = await fetch(url, {
@@ -24,11 +23,17 @@ const TEST_URL = "https://interstellarassets.xendyexe.workers.dev/test.game";
         const decoder = new TextDecoder("utf-8");
 
         const htmlLength = view.getUint32(0, true);
-        const html = decoder.decode(new Uint8Array(buffer, 4, htmlLength));
-        const js = decoder.decode(new Uint8Array(buffer, 4 + htmlLength));
-        
+        const jslength = view.getUint32(4, true);
+        const html = decoder.decode(new Uint8Array(buffer, 8, htmlLength));
+        const js = decoder.decode(new Uint8Array(buffer, 8 + htmlLength, jslength));
+        const wasmBytes = new Uint8Array(buffer, 8 + htmlLength + jslength);
+        const wasm = new Blob([wasmBytes], {type: "application/wasm"});
+        console.log(htmlLength, jslength);
+        sessionStorage.setItem("interstellarwasm", URL.createObjectURL(wasm));
 
         document.documentElement.innerHTML = html;
+        if (test) console.log("%cSuccessfully injected %cInter%cstellar%c for %c test.%cdrednot.io", "color: #AAAAAA", "color: #FFFFFF", "color: #FF7AAC", "color: #AAAAAA", "color: #FFFFFF", "color: #AAAAAA");
+        else console.log("%cSuccessfully injected %cInter%cstellar%c for %cdrednot.io", "color: #AAAAAA", "color: #FFFFFF", "color: #FF7AAC","color: #AAAAAA", "color: #FFFFFF");
         const script = document.createElement("script")
         script.innerHTML = js;
         document.body.appendChild(script);

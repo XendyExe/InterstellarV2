@@ -15,8 +15,19 @@ class Devpack {
         const enableJSON = await (await fetch(this.dirurl + "enable.json")).json();
         const enable = enableJSON.enabled;
         if (!enable) throw "Devpack is not enabled, see enable.json inside the moddev folder!";
-        const devpackVersion = +(await (await fetch(this.dirurl + "__devpack__/version.txt")).text());
-        console.log("this uesr is running devpack", devpackVersion);
+        const config = await (await fetch(this.dirurl + "interstellar.json")).json();
+        if (config.scripting) {
+            try {
+                const devpackVersion = +(await (await fetch(this.dirurl + "__devpack__/version.txt")).text());
+                if (devpackVersion < Interstellar.build) {
+                    setTimeout(() => {
+                        StellarAPI.UI.showPrompt("Warning", `Your devpack outdated! It is made for build ${devpackVersion} when your game is on build ${Interstellar.build}! Consider updating at https://github.com/XendyExe/Interstellar-Devpack`, () =>{});
+                    }, 1000)
+                }
+            } catch(e) {
+                
+            }
+        }
         this.modpack = await (new Modpack()).initdevpack(this.getFile.bind(this), true, () => {})
     }
 

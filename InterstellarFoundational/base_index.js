@@ -15,6 +15,7 @@
        return r(d.id);
    }
    let m = [];
+   window.internals = m;
    let c = r.c = [ /* Internal */ ];
    /* InitInterstellar */
    /* Start */

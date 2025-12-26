@@ -24,6 +24,7 @@ import { TriggerEvent } from "./API/InterstellarEvents";
 import UIEventDispatcher from "./Patching/UIEventDispatcher";
 import StellarCommandsManager from "./API/StellarCommandsManager";import ModpackImporter from "./Modding/ModpackImporter";
 import Devpack from "./API/Devpack";
+import __wbg_init from "@InterstellarInternals";
  StellarCommandsManager;
 
 interface Graphics {
@@ -73,12 +74,16 @@ class Interstellar {
     connectServer = -1;
     ingame = false;
     dev: boolean = false;
+
+    build: number;
     constructor() {
+        let splits = document.getElementById("debugMenuOpener")!!.innerHTML.split(".");
+        this.build = Number.parseInt(splits[splits.length - 1]!!);
         let dsaSettings = localStorage.getItem("dredark_user_settings");
         if (dsaSettings) this.connectServer = JSON.parse(dsaSettings).preferred_server;
         else this.connectServer = 0;
         this.dev = localStorage.getItem("interstellarDEV") == "true";
-        console.log("Interstellar dev mode?", this.dev);
+        console.log("Interstellar dev mode?", this.dev, "for build", this.build);
         const gameContainer = document.querySelector("#game-container")!! as HTMLDivElement;
         gameContainer.oncontextmenu = () => {return false};
         this.drednotCanvas = document.querySelector("#canvas-game")!! as HTMLCanvasElement;
@@ -112,6 +117,7 @@ class Interstellar {
     }
     // Called when internal is loaded
     async loaded() {
+        await __wbg_init(sessionStorage.getItem("interstellarwasm")!!);
         StellarAPI.Packet = new InterstellarPacketAPI();
         StellarAPI.DrednotSettings = new InterstellarDrednotSettingsAPI();
         loadTransitionSfx();
@@ -190,6 +196,7 @@ class Interstellar {
             const index = enabledMods.indexOf(mod);
             if (index != -1) enabledMods.splice(index, 1);
         })
+        localStorage.setItem("interstellarEnabledMods", JSON.stringify(enabledMods));
 
         PerformanceMetrics.split("Modpacks preloaded");
 

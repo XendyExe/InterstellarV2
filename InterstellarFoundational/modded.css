@@ -8,7 +8,7 @@
    flex-direction: column;
    justify-self: center;
    align-self: anchor-center;
-   z-index: 99999;
+   z-index: 100;
 }
 
 

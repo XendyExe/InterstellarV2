@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 from minify_html import minify_html
 
-require_regex = re.compile(r"require\(\"([a-zA-Z_0-9]+)\"\)", re.RegexFlag.MULTILINE)
+require_regex = re.compile(r"require\(\"([@a-zA-Z_0-9]+)\"\)", re.RegexFlag.MULTILINE)
 commonjs_require_regex = re.compile(r"require\(\"(.*?)\"\)", re.RegexFlag.MULTILINE)
 id_regex = re.compile(r"exports\.id ?= ?\"(.+)\";?", re.RegexFlag.MULTILINE)
 pixi_regex = re.compile(r"const\s+?(.*?)\s*?=\s*?require\(\"pixi\.js\"\);", re.RegexFlag.MULTILINE)
@@ -39,6 +39,10 @@ def compile_drednot(name, path, forceObfuscate=False):
             js = reader.read()
             ordered_names.append(js_name)
             ordered_scripts.append(js)
+    print("Loading internals")
+    with open("InterstellarInternals/build/interstellar_internals.js", "r", encoding="utf-8") as reader:
+        ordered_names.append("@InterstellarInternals")
+        ordered_scripts.append(reader.read().replace("module.exports = ", "").replace("__defProp({}", "__defProp(exports"))
     print("Generating asset tree")
     asset_tree = {}
     folder = Path("Assets")
@@ -157,8 +161,15 @@ def compile_drednot(name, path, forceObfuscate=False):
     ).encode("utf-8")
 
     build_length = len(build_result).to_bytes(4, byteorder="little")
+    index_js = index_js.encode('utf-8')
+    js_length = len(index_js).to_bytes(4, byteorder="little")
+    
+    with open("InterstellarInternals/build/interstellar_internals.wasm", "rb") as reader:
+        wasm = reader.read()
 
-    build_result = build_length + build_result + index_js.encode("utf-8")
+    print("Lengths:", len(build_result), len(index_js), len(wasm))
+
+    build_result = build_length + js_length + build_result + index_js+ wasm
 
 
     with open(build_path + "index.game", "wb") as writer:
