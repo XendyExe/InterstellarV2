@@ -2,6 +2,7 @@ import { AnimatedSprite, Assets, Sprite, Spritesheet, Texture, TextureSourceLike
 import ZoneBackground from "./ZoneBackground";
 import { BackgroundSprite } from "../Modding/ModdingTypes/BackgroundConfig";
 import { Modpack } from "../Modding/Modpack";
+import Interstellar from "../Interstellar";
 
 const tileOptions = ["", "x", "y", "xy"];
 const TWOPI = Math.PI * 2;
@@ -150,7 +151,8 @@ export class ModpackZoneBackground extends ZoneBackground {
         this.container.sortChildren();
     }
     tick(): void {
-        this.sprites.forEach(sprite=>sprite.tick(0, 0, (this.startTime - Date.now()) / 1000));
+        let position = Interstellar.patcher.getPlayerPosition();
+        this.sprites.forEach(sprite=>sprite.tick(-position.x, position.y, (this.startTime - Date.now()) / 1000));
     }
     onSwitch() {
         this.startTime = Date.now();

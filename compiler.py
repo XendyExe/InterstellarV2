@@ -42,7 +42,7 @@ def compile_drednot(name, path, forceObfuscate=False):
     print("Loading internals")
     with open("InterstellarInternals/build/interstellar_internals.js", "r", encoding="utf-8") as reader:
         ordered_names.append("@InterstellarInternals")
-        ordered_scripts.append(reader.read().replace("module.exports = ", "").replace("__defProp({}", "__defProp(exports"))
+        ordered_scripts.append(reader.read())
     print("Generating asset tree")
     asset_tree = {}
     folder = Path("Assets")

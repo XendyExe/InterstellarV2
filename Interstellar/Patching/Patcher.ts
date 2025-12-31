@@ -1,16 +1,16 @@
+import { get_internals, give_world_manager } from "@InterstellarInternals";
 import { ChatCloseEvent, ChatMessageRecieveEvent, ChatMessageSendEvent, CrewListUpdateEvent, JoinShipEvent, JoinShipRequestEvent, ProcessMOTDEvent, SocketCloseEvent, SocketMessageRecieveEvent, SocketOpenEvent, TriggerEvent } from "../API/InterstellarEvents";
 import StellarAPI from "../API/StellarAPI";
 import StellarCommandsManager from "../API/StellarCommandsManager";
 import StellarEventManager from "../API/StellarEventManager";
 import Interstellar from "../Interstellar";
-import { DREDNOT_ZONES, NAV_POINTER } from "../StellarConstants";
+import { DREDNOT_ZONES } from "../StellarConstants";
 import { DebugDrawer, LoadDebugRequires } from "./DebugDrawer";
 
 const joinShipServerMessage = /Joined ship '(.*?)' {([0-9A-F]+)}$/
 const joinMessage = /(\[(Captain|Crew)\])?(#?[a-zA-Z0-9-_ ]+) joined the ship\./;
 class Patcher {
     webgl: WebGLRenderingContext | undefined = undefined;
-    wasmInstance: WebAssembly.Instance | undefined = undefined; 
 
     audioOverrides: Record<string, string> = {};
     imageOverrides: Record<string, string> = {};
@@ -38,6 +38,8 @@ class Patcher {
     gameActive = false;
     enableGriefMessages = true;
 
+    interstellarInternals: any;
+
     constructor() {
         // Idk why i need to do this
         document.getElementById("motd-toggle")!!.classList.remove("close");
@@ -54,12 +56,14 @@ class Patcher {
         this.inputManager = require("InputManager");
         // @ts-ignore
         this.worldManager = require("WorldManager");
+        give_world_manager(this.worldManager);
         // @ts-ignore
         this.accountManager = require("AccountManager");
         // @ts-ignore
         this.htmluifunctions = require("HTMLUIFunctions");
         // @ts-ignore
         this.textformatter = require("TextFormatter");
+        this.interstellarInternals = get_internals();
     }
 
     setWebgl(gl: WebGLRenderingContext) {
@@ -67,15 +71,15 @@ class Patcher {
         return gl;
     }
 
-    setWasmInstance(instance: WebAssembly.Instance) {
-        this.wasmInstance = instance;
+    getNavDestination() {
+        return this.interstellarInternals.nav_destination;
     }
 
-    // fucking black magic
-    getNavDestination() {
-        // @ts-ignore
-        let view = new DataView(this.wasmInstance!!.memory.buffer);
-        return view.getUint32(NAV_POINTER, true);
+    getPlayerPosition() {
+        return {
+            x: this.interstellarInternals.px,
+            y: this.interstellarInternals.py
+        }
     }
 
     toggleUIPatch(model: string, current: any) {

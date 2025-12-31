@@ -117,7 +117,7 @@ class Interstellar {
     }
     // Called when internal is loaded
     async loaded() {
-        await __wbg_init(sessionStorage.getItem("interstellarwasm")!!);
+        await __wbg_init({module_or_path: sessionStorage.getItem("interstellarwasm")!!});
         StellarAPI.Packet = new InterstellarPacketAPI();
         StellarAPI.DrednotSettings = new InterstellarDrednotSettingsAPI();
         loadTransitionSfx();

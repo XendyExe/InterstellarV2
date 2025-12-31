@@ -35,6 +35,7 @@ def build_dred():
     global lastBuildTime
     if not directory_changed_since("Assets", lastBuildTime) and \
             not directory_changed_since("Interstellar", lastBuildTime) and \
+            not directory_changed_since("InterstellarInternals", lastBuildTime) and \
             not os.path.getmtime(os.path.abspath("InterstellarFoundational/modded.css")) > lastBuildTime:
         print("Do not need to build, is most updated!")
         with open("cache/prod_build/index.game", "rb") as reader:
