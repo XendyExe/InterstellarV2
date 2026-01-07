@@ -129,7 +129,7 @@ class Keybinds {
             if ((!keybind.disabled && keybind.alt == alt && keybind.shift == shift && keybind.control == control && keybind.key == code)) {
                 console.log("Executing Keybind", keybind);
                 let result = StellarCommandsManager.executeCommand("/" + keybind.command);
-                if (result) StellarAPI.sendPacket({type: StellarAPI.Packet.ClMsgChat, msg: result});
+                if (result) StellarAPI.sendChat(result, true);
                 event.preventDefault();
             }
         })

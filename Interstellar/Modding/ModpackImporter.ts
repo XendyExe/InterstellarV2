@@ -206,7 +206,7 @@ class ModpackImporter {
             const getFileFunction = async (path: string) => {
                 return pack[path];
             }
-            validation = await (new Modpack()).init(getFileFunction, false, () => {}, false);
+            validation = await (new Modpack("")).init(getFileFunction, false, () => {}, false);
         } catch (s) {
             console.log(s);
             loading.complete();

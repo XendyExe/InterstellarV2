@@ -135,7 +135,7 @@ class Keybinds {
                 console.log("Executing Keybind", keybind);
                 let result = StellarCommandsManager_1.default.executeCommand("/" + keybind.command);
                 if (result)
-                    StellarAPI_1.default.sendPacket({ type: StellarAPI_1.default.Packet.ClMsgChat, msg: result });
+                    StellarAPI_1.default.sendChat(result, true);
                 event.preventDefault();
             }
         });

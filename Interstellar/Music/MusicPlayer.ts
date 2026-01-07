@@ -1,8 +1,6 @@
 import { TriggerEvent } from "../API/InterstellarEvents";
 import StellarEventManager from "../API/StellarEventManager";
 import Interstellar from "../Interstellar";
-import { InterstellarLoadingScreen } from "../InterstellarLoadingScreen";
-import { createNotification } from "../Modding/StellarNotif";
 import StellarAssetManager from "../StellarAssetManager";
 import { Music } from "./Music";
 
@@ -20,9 +18,17 @@ export interface MusicDebugData {
     unloading: boolean
 }
 
+export interface CacheDebugData {
+    name: string,
+    completion: number,
+    length: number
+}
+
 export interface ProcessorDebugData {
-    memory: number,
-    loaded_songs: MusicDebugData[]
+    wasm_mem: number,
+    cache_mem: number,
+    loaded_song: MusicDebugData,
+    caches: CacheDebugData[]
 }
 
 

@@ -279,6 +279,10 @@ class StellarAPI {
         await Interstellar.patcher.joinShip(server, data)
     }
 
+    sendChat(text: string, no_events: boolean | undefined) {
+        Patcher.sendChatCallback(text, no_events);
+    }
+
     sendPacket(packet: any) {
         this.websocket?.send(Interstellar.patcher.msgpack.encode(packet));
     }

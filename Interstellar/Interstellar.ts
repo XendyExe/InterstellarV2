@@ -138,7 +138,7 @@ class Interstellar {
                         flattenedModpack[split.join("/")] = file;
                     }
                 }
-                this.loadedModpacks.unshift(await createModpack(flattenedModpack, true));
+                this.loadedModpacks.unshift(await createModpack(flattenedModpack, internalModpackName, "internal"));
                 for (const path of Object.keys(flattenedModpack)) {
                     delete AssetManager.internal![internalModpackName + "/" + path];
                 }
@@ -152,7 +152,7 @@ class Interstellar {
                         flattenedModpack[split.join("/")] = file;
                     }
                 }
-                this.loadedModpacks.unshift(await createModpack(flattenedModpack, true));
+                this.loadedModpacks.unshift(await createModpack(flattenedModpack, "InterstellarQOL", "internal"));
                 for (const path of Object.keys(flattenedModpack)) {
                     delete AssetManager.internal!["InterstellarQOL/" + path];
                 }
@@ -184,7 +184,7 @@ class Interstellar {
                     this.loadedModpacks.unshift(await createTexturePack(assetStore));
                     PerformanceMetrics.split(`Preloaded [TP] ${config.name}`);
                 } else {
-                    this.loadedModpacks.unshift(await createModpack(assetStore, false));
+                    this.loadedModpacks.unshift(await createModpack(assetStore, undefined, modid));
                     for (const path of Object.keys(assetStore)) {
                         delete assetStore[path];
                     }
@@ -218,6 +218,7 @@ class Interstellar {
     }
 
     async backgroundLoader() {
+        await this.patcher.waitRequires;
         PerformanceMetrics.push(`Async load:`);
         PerformanceMetrics.split(`Loading modpacks`);
         StellarEventManager.dispatchTrigger(TriggerEvent.LOAD);
@@ -254,6 +255,18 @@ class Interstellar {
         await musicPlayer.loadMusic(usedMusic);
         PerformanceMetrics.split(`Finished loading music!`);
         PerformanceMetrics.end();
+
+        // Delete musiccache if still exists
+        console.log("Deleting musiccache");
+        await new Promise<void>((resolve, reject) => {
+            const req = indexedDB.deleteDatabase("musiccache");
+            req.onsuccess = () => resolve();
+            req.onerror = () => {
+                console.error("Failed to delete musiccache", req.error);
+                reject(req.error);
+            };
+        });
+        console.log("Done!");
     }
     endTick() {
         if (!this.started) return;

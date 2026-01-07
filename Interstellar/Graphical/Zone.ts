@@ -2,10 +2,11 @@ import { Filter } from "pixi.js";
 
 import ZoneBackground from "./ZoneBackground";
 import Interstellar from "../Interstellar";
-import glitch from "./Transition";
+import glitch, { glitchEx } from "./Transition";
 import { Music } from "../Music/Music";
 import { Textures } from "../Modding/Textures";
 import { switchToTheme } from "../Modding/Theme";
+import { ModpackZoneBackground } from "./ModpackZoneBackground";
 
 export interface SubZone {
     name: string;
@@ -40,14 +41,22 @@ class Zone {
     }
 
     teleportToZone(other: Zone) {
-        glitch(300, () => {
+        glitchEx(300, async () => {
+            let bg = other.subzones[other.currentIndex]?.background;
+            if (bg instanceof ModpackZoneBackground) {
+                console.log("Waaiting for other load!");
+                await bg.load();
+            }
+        }, async () => {
+            console.log("Other zone is loaded, teleporting!");
             this.active = false;
             for (const subzone of this.subzones) {
                 if (subzone.music) subzone.music.deactivate();
+                if (subzone.background instanceof ModpackZoneBackground) subzone.background.unload();
             }
             Interstellar.graphics.background.removeChildren();
-            if (other) other.createZone();
-        })
+            other.createZone();
+        });
     }
 
     createZone() {
@@ -87,6 +96,7 @@ class Zone {
                     background.container.zIndex = 10000;
                     if (this.useSmoothTransition) {
                         if (background.container.alpha < 1) background.container.alpha += 0.02;
+
                         if (background.container.alpha > 0.5 && this.transitionTarget != this.currentIndex) {
                             if (this.subzones[this.currentIndex]!!.music) this.subzones[this.currentIndex]!!.music!!.deactivate();
                             this.currentIndex = this.transitionTarget;
@@ -102,7 +112,12 @@ class Zone {
                         if (this.transitionTarget != this.currentIndex) {
                             if (this.subzones[this.currentIndex]!!.music) this.subzones[this.currentIndex]!!.music!!.deactivate();
                             this.currentIndex = this.transitionTarget;
-                            glitch(300, () => {
+                            glitchEx(300, async () => {
+                                let bg = this.subzones[this.currentIndex]?.background;
+                                if (bg instanceof ModpackZoneBackground) {
+                                    await bg.load();
+                                }
+                            }, async () => {
                                 this.subzones[this.currentIndex]?.background.onSwitch();
                                 if (this.active) if (this.subzones[this.currentIndex]!!.music) {
                                     this.subzones[this.currentIndex]!!.music!!.activate();
@@ -110,7 +125,7 @@ class Zone {
                                     Interstellar.graphics.game.filters = this.subzones[this.currentIndex]?.filter;
                                     switchToTheme(this.subzones[this.currentIndex]!.theme);
                                 }
-                            });
+                            })
                         }
                     }
                 }
@@ -119,6 +134,11 @@ class Zone {
                     if (background.container.alpha > 0) {
                         if (this.useSmoothTransition) background.container.alpha -= 0.05;
                         else background.container.alpha = 0;
+                        if (background.container.alpha <= 0) {
+                            if (background instanceof ModpackZoneBackground && background.loaded) {
+                                background.unload();
+                            }
+                        }
                     }
                 }
             }

@@ -39,8 +39,12 @@ class Patcher {
     usersettingsmanager: any = require("UserSettingManager");;
     gameActive = false;
     enableGriefMessages = true;
+    sendChatCallback: any;
 
     interstellarInternals: any;
+
+    resolveWaitRequires: any;
+    waitRequires = new Promise<void>((resolve) => {this.resolveWaitRequires = resolve;})
 
     constructor() {
         // Idk why i need to do this
@@ -69,6 +73,7 @@ class Patcher {
         // @ts-ignore
         this.textformatter = require("TextFormatter");
         this.interstellarInternals = get_internals();
+        this.resolveWaitRequires();
     }
 
     setWebgl(gl: WebGLRenderingContext) {

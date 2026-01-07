@@ -1,3 +1,4 @@
+import { LOADED_BITMAPS } from "../Graphical/ModpackZoneBackground";
 import parseColor from "../Modding/ColorParser";
 import musicPlayer from "../Music/MusicPlayer";
 import PerformanceMetrics, { stellarFormatLoadTimes } from "../PerformanceMetrics";
@@ -61,39 +62,56 @@ export class DebugDrawer {
             Graphics.drawTextSS("Network Data Rate: " + network.netDataRate + " bps", x, 60, color, 14)
         }
         let u = (InputManager.next_cmd_number - WorldManager.LATEST_PREDICTED_COMMAND) * TickerTime.time.tick_delta_ms;
-        Graphics.drawTextSS("Estimated Turnaround Time: " + u + " ms", x, 90, color, 14);
-        Graphics.drawTextSS("Frame Time: " + this.frameTimeTotal.toFixed(2) + " ms", x, 120, color, 14);
-        Graphics.drawTextSS("Interstellar Rendering: " + this.interstellarFrameTime.toFixed(2) + " ms (" + (((this.interstellarFrameTime/this.frameTimeTotal) * 100).toFixed(2)) + "%)", x, 145, color, 10);
+        let ry = 90;
+        Graphics.drawTextSS("Estimated Turnaround Time: " + u + " ms", x, ry, color, 14); ry += 30;
+        Graphics.drawTextSS("Frame Time: " + this.frameTimeTotal.toFixed(2) + " ms", x, ry, color, 14); ry += 25;
+        Graphics.drawTextSS("Interstellar Rendering: " + this.interstellarFrameTime.toFixed(2) + " ms (" + (((this.interstellarFrameTime/this.frameTimeTotal) * 100).toFixed(2)) + "%)", x, ry, color, 10); ry += 20;
         if (ship != null) {
-            this.drawTickTime("Ship", ship, 170)
+            this.drawTickTime("Ship", ship, ry)
         }
+        ry += 20;
         if (world != null) {
-            this.drawTickTime("Overworld", world, 190)
+            this.drawTickTime("Overworld", world, ry)
         }
+        ry += 20;
         if (relay != null) {
-            Graphics.drawTextSS(`Relay: cpu = ${relay.cpu_load}%`, x, 210, color, 10)
+            Graphics.drawTextSS(`Relay: cpu = ${relay.cpu_load}%`, x, ry, color, 10)
         }
-        Graphics.drawTextSS("Interstellar Music: ", x, 240, color, 14);
+        ry += 20;
+        Graphics.drawTextSS("Interstellar Music: ", x, ry, color, 14);
+        ry += 20;
         musicPlayer.requestDebugData = true;
-        let musicY = 260;
         if (musicPlayer.debug_data == null) {
-            Graphics.drawTextSS(`Loading processor debug data...`, x, musicY, color, 10);
+            Graphics.drawTextSS(`Loading processor debug data...`, x, ry, color, 10);
+            ry += 20;
         } else {
-            Graphics.drawTextSS(`Memory usage: ${formatBytes(musicPlayer.debug_data.memory)}`, x, musicY, color, 10);
+            Graphics.drawTextSS(`Memory usage: ${formatBytes(musicPlayer.debug_data.wasm_mem + musicPlayer.debug_data.cache_mem)}`, x, ry, color, 10);
+            ry += 14;
+            Graphics.drawTextSS(`Wasm: ${formatBytes(musicPlayer.debug_data.wasm_mem)} | JS Cache: ${formatBytes(musicPlayer.debug_data.cache_mem)}`, x, ry, color, 7);
+            ry += 18;
         }
-        musicY += 20;
         if (musicPlayer.debug_data != null) {
-            for (let music of musicPlayer.debug_data.loaded_songs) {
-                let result = `${music.name}: ${format_music_samples(music.time)} - ${format_music_samples(music.length)} // Avg. Buff=${Math.floor(music.buffer_length)}/4096`;
+            let music = musicPlayer.debug_data.loaded_song;
+            if (music !== null) {
+                let result = `${music.name}: ${format_music_samples(music.time % music.length)} - ${format_music_samples(music.length)} // Avg. Buff=${Math.floor(music.buffer_length)}/4096`;
                 let tags = ""
                 if (music.active) tags += "A"
-                if (music.unloading) tags += "U"
                 if (music.playing) tags += "P"
                 if (music.resampler) tags += "R"
                 if (tags != "") tags = "[" + tags + "] "
                 result = tags + result
-                Graphics.drawTextSS(result, x, musicY, color, 10);
-                musicY += 20;
+                Graphics.drawTextSS(result, x, ry, color, 10);
+                ry += 20;
+            }
+            Graphics.drawTextSS("Caches:", x, ry, color, 10);
+            ry += 20;
+            for (let cache of musicPlayer.debug_data.caches) {
+                let result = `${cache.name}: ${cache.completion}/${cache.length}`;
+                Graphics.drawTextSS(result, x, ry, color, 10);
+                ry += 20;
+            }
+            if (musicPlayer.debug_data.caches.length == 0) {
+                Graphics.drawTextSS("No caches playing...", x, ry, color, 10);
             }
         }
         
@@ -107,12 +125,41 @@ export class DebugDrawer {
             let _ = ship.getColor(p, d).toString(16).padStart(2, "0");
             Graphics.drawText("(" + p + "," + d + ") " + s + ":" + S + ":" + m + ":" + _, p + .5, d + 1.5, color, 10)
         }
-        let loadX = 1000;
-        Graphics.drawTextSS("Interstellar load times:", loadX, 60, color, 14)
-        let loadY = 90;
-        for (const line of PerformanceMetrics.text) {
-            if (line) Graphics.drawTextSS(line, loadX, loadY, color, 10);
-            loadY += 20;
+
+        let sX = 1000;
+        let sY = 90;
+        let canvas_memory = 0;
+        let bitmap_memory = 0;
+        for (const bitmap of LOADED_BITMAPS) {
+            bitmap_memory += bitmap.width * bitmap.height * 4;
         }
+        const canvases = document.querySelectorAll('canvas');
+        canvases.forEach((canvas, i) => {
+            canvas_memory += canvas.width * canvas.height * 4;
+        });
+        // @ts-ignore
+        const js_heap_used = performance.memory.usedJSHeapSize ?? 0;
+        // @ts-ignore
+        const js_heap_allocated = performance.memory.totalJSHeapSize ?? 0;
+        // js heap tends to add about 3mb
+        let music_player_mem = 3000000;
+        if (musicPlayer.debug_data != null) {
+            music_player_mem += musicPlayer.debug_data.wasm_mem + musicPlayer.debug_data.cache_mem;
+        }
+
+        Graphics.drawTextSS(`Total analyzable memory: ${formatBytes(canvas_memory + bitmap_memory + canvas_memory + js_heap_allocated, )}`, sX, sY, color, 14); sY += 25;
+        Graphics.drawTextSS(`JS Heap: ${formatBytes(js_heap_used)}/${formatBytes(js_heap_allocated)}`, sX, sY, color, 10); sY += 20;
+        Graphics.drawTextSS(`Music: ${formatBytes(music_player_mem)}`, sX, sY, color, 10); sY += 20;
+        Graphics.drawTextSS(`Bitmaps: ${formatBytes(bitmap_memory)}`, sX, sY, color, 10); sY += 20;
+        Graphics.drawTextSS(`Canvases: ${formatBytes(canvas_memory)}`, sX, sY, color, 10); sY += 20;
+
+
+        // let loadX = 1000;
+        // Graphics.drawTextSS("Interstellar load times:", loadX, 60, color, 14)
+        // let loadY = 90;
+        // for (const line of PerformanceMetrics.text) {
+        //     if (line) Graphics.drawTextSS(line, loadX, loadY, color, 10);
+        //     loadY += 20;
+        // }
     }
 }

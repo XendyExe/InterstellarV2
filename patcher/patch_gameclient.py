@@ -17,7 +17,7 @@ regex_frame_end = re.compile(r"([a-zA-Z_$]+?)\.graphics\.gfx\.text_end_frame\(\)
 function_frame_end = lambda match: f"interstellar.patcher.trigger_frame_end(this);{match[1]}.graphics.gfx.text_end_frame();"
 
 regex_chatcallback = re.compile(r"\.setChatCallback\(([a-zA-Z_$]+) ?=> ?{", re.MULTILINE)
-function_chatcallback = lambda match: f".setChatCallback(({match[1]}) => " + "{" + f"{match[1]} = interstellar.patcher.onSendChat({match[1]}); if (!{match[1]} || {match[1]} == \"\") return;"
+function_chatcallback = lambda match: f".setChatCallback(interstellar.patcher.sendChatCallback = ({match[1]}, skip) => " + "{if (!skip){" + f"{match[1]} = interstellar.patcher.onSendChat({match[1]}); if (!{match[1]} || {match[1]} == \"\") return;" + "};"
 
 regex_warninggrief = re.compile(r'([a-zA-Z0-9_$]+)\.writeChat\(`<b class="warning">', re.MULTILINE)
 function_warninggrief = lambda match: f"if (interstellar.patcher.enableGriefMessages) {match[1]}.writeChat(`<b class='warning'>"

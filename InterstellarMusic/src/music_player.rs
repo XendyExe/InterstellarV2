@@ -1,11 +1,12 @@
-use crate::{console, ACTIVE_FADE_DELTA, AUDIO_SAMPLE_RATE, WEB_AUDIO_QUANTUM};
+use crate::console_log;
+use crate::source_stream::JSSourceStream;
+use crate::{console, AudioFadeCache, ACTIVE_FADE, ACTIVE_FADE_DELTA, AUDIO_SAMPLE_RATE, WEB_AUDIO_QUANTUM};
 use resampler::{Attenuation, Latency, ResamplerFir, SampleRate};
 use ringbuf::consumer::Consumer;
 use ringbuf::storage::Heap;
 use ringbuf::traits::{Observer, Producer, RingBuffer};
 use ringbuf::LocalRb;
 use std::convert::TryFrom;
-use std::io::Cursor;
 use symphonia::core::audio::Signal;
 use symphonia::core::codecs::{Decoder, DecoderOptions};
 use symphonia::core::errors::Error;
@@ -15,10 +16,11 @@ use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
 use symphonia::core::units::Time;
 use wasm_bindgen::throw_str;
-
-use crate::console_log;
+use web_sys::js_sys::Uint8Array;
 
 pub const FRAME_BUFFER_SIZE: usize = 4096;
+
+// todo fix loop point
 
 pub struct InterstellarResampler {
     sampler: ResamplerFir,
@@ -66,36 +68,32 @@ pub struct InterstellarMusic {
     pub current_time: u64,
     pub started: bool,
 
-    pub unloading: bool,
-    pub unloaded: bool,
-
-    pub average_buffer: f32
+    pub average_buffer: f32,
+    pub packet_time: u64
 }
 
 impl InterstellarMusic {
-    pub fn new(name: String, hash: String, bytes: &[u8], start_time: f64) -> Self {
+    pub fn new(name: String, hash: String, bytes: &Uint8Array, start_time: f64) -> Self {
         // Load the bytes as a file to read in symphonia
-        let owned = bytes.to_owned();
-        let cursor = Cursor::new(owned);
-        let source = MediaSourceStream::new(Box::new(cursor), Default::default());
+        let source = JSSourceStream::new(bytes);
+        console_log!("Creating mss from {:?} bytes", source.byte_len());
+        let mss = MediaSourceStream::new(
+            Box::new(source),
+            Default::default(),
+        );
         // Create a probe
         let hint = Hint::new();
-        let format_opts: FormatOptions = Default::default();
+        let format_opts: FormatOptions = FormatOptions {
+            enable_gapless: true,
+            ..Default::default()
+        };
+
         let metadata_opts: MetadataOptions = Default::default();
-        let mut probed =
-            symphonia::default::get_probe().format(&hint, source, &format_opts, &metadata_opts).unwrap();
+        let probed =
+            symphonia::default::get_probe().format(&hint, mss, &format_opts, &metadata_opts).unwrap();
 
         // Get format, usable track ids, and a decoder
-        let mut current_time: u64 = 0;
-        if start_time != 0.0 {
-            console_log!("Seeking to {} in {} ({}, {})", start_time, name, start_time.trunc() as u64, start_time.fract());
-            probed.format.seek(
-                SeekMode::Accurate,
-                SeekTo::Time { time: Time::new(start_time.trunc() as u64, start_time.fract()), track_id: None }
-            ).expect("Failed to seek in song");
-            current_time = (start_time * AUDIO_SAMPLE_RATE as f64) as u64;
-        }
-        let format = probed.format;
+        let mut format = probed.format;
         let Some(track) = format.default_track() else { throw_str("File has no default track") };
         let track_id = track.id;
         let codec_params = track.codec_params.clone();
@@ -104,6 +102,16 @@ impl InterstellarMusic {
             .expect("unsupported codec");
         let Some(sample_rate) = track.codec_params.sample_rate else {throw_str("Default track has no sample rate")};
         let Some(frames) = track.codec_params.n_frames else {throw_str("Default track has no frame count")};
+        let length = frames as f64 / sample_rate as f64;
+
+        // Seek to start time, wrap if needed
+        if start_time != 0.0 {
+            let start = start_time % length;
+            format.seek(
+                SeekMode::Accurate,
+                SeekTo::Time { time: Time::new(start.trunc() as u64, start.fract()), track_id: None }
+            ).expect("Failed to seek in song");
+        }
         let length = frames;
 
         let frame_buffer_left: LocalRb<Heap<f32>> = LocalRb::new(FRAME_BUFFER_SIZE);
@@ -131,13 +139,11 @@ impl InterstellarMusic {
 
             volume: 0.0,
             pause_time: None,
-            current_time,
+            current_time: 0,
             length,
             started: false,
-
-            unloading: false,
-            unloaded: false,
-            average_buffer: 0.0
+            average_buffer: 0.0,
+            packet_time: 0
         }
     }
 
@@ -148,19 +154,22 @@ impl InterstellarMusic {
             let decoder = &mut self.decoder;
             let packet = match format.next_packet() {
                 Ok(p) => p,
-                Err(_) => {
-                    // Loop back to start because it is the end.
+                Err(Error::IoError(_)) => {
+                    // If we hit EOF somehow
                     format.seek(
                         SeekMode::Accurate,
-                        SeekTo::Time { time: Time::new(0, 0.0), track_id: None }
+                        SeekTo::TimeStamp { ts: 0, track_id: self.track_id }
                     ).expect("Failed to seek in song");
                     decoder.reset();
                     continue;
                 }
+                Err(e) => panic!("{}", e),
             };
             if packet.track_id() != self.track_id {
                 continue;
             }
+
+            self.packet_time = packet.ts;
 
             match decoder.decode(&packet) {
                 Ok(decoded) => {
@@ -177,7 +186,7 @@ impl InterstellarMusic {
                     continue
                 }
                 Err(err) => {
-                    // An unrecoverable error occured, halt decoding.
+                    // An unrecoverable error occurred, halt decoding.
                     panic!("{}", err);
                 }
             }
@@ -185,7 +194,6 @@ impl InterstellarMusic {
     }
 
     pub fn update_music(&mut self, left_result: &mut [f32], right_result: &mut [f32], global_volume: f32, time: u64) -> Option<f32> {
-        if self.unloaded { throw_str("Attempted to update a unloaded music object"); }
         if self.active && self.volume < 1.0 {
             self.volume = f32::min(self.volume + ACTIVE_FADE_DELTA, 1.0);
         }
@@ -195,15 +203,12 @@ impl InterstellarMusic {
 
         let master_volume = global_volume * self.volume;
         if master_volume == 0f32 {
-            if self.unloading {
-                self.unloaded = true;
-                return None;
-            }
             if self.pause_time.is_none() {
                 self.average_buffer = 0.0;
                 self.pause_time = Some((self.current_time, time));
-                console_log!("Pausing {}!!", self.file_name);
+                console_log!("Pausing {} at {}, {}", self.file_name, self.current_time, time);
             }
+            self.playing = false;
             // Tell the mixer to not mix us, we have no data
             return None;
         }
@@ -216,7 +221,7 @@ impl InterstellarMusic {
                     let continue_time_samples = (pause_time.0 + (time - pause_time.1)) % self.length;
                     let continue_time = continue_time_samples as f64 / AUDIO_SAMPLE_RATE as f64;
                     self.format.seek(
-                        SeekMode::Coarse,
+                        SeekMode::Accurate,
                         SeekTo::Time { time: Time::new(continue_time.trunc() as u64, continue_time.fract()), track_id: None }
                     ).expect("Failed to seek in song");
                     self.current_time = continue_time_samples;
@@ -275,5 +280,27 @@ impl InterstellarMusic {
 
         // return
         Some(master_volume)
+    }
+
+    pub fn get_fade_buffers(&mut self, time: u64) -> AudioFadeCache{
+        let length: usize = f32::ceil(((self.volume / ACTIVE_FADE) * AUDIO_SAMPLE_RATE as f32) / WEB_AUDIO_QUANTUM as f32) as usize * WEB_AUDIO_QUANTUM ;
+        let mut current_time = self.current_time;
+        if let Some(pause_time) = self.pause_time {
+            current_time = (pause_time.0 + (time - pause_time.1)) % self.length;
+        }
+        let mut result = AudioFadeCache::new(self.file_name.clone(), self.hash.clone(), current_time, length, self.volume);
+        let mut consume_left = [0.0f32; WEB_AUDIO_QUANTUM];
+        let mut consume_right = [0.0f32; WEB_AUDIO_QUANTUM];
+        let mut sim_time = time;
+        let mut filled = 0;
+
+        while filled < length {
+            self.update_music(&mut consume_left, &mut consume_right, 1.0, sim_time);
+            result.buffer_left[filled..filled + WEB_AUDIO_QUANTUM].copy_from_slice(&consume_left);
+            result.buffer_right[filled..filled + WEB_AUDIO_QUANTUM].copy_from_slice(&consume_right);
+            filled += WEB_AUDIO_QUANTUM;
+            sim_time += WEB_AUDIO_QUANTUM as u64;
+        }
+        result
     }
 }

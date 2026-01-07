@@ -23,3 +23,9 @@ export function parsePathSplits(splits: string[]) {
 export function splitPath(path: string) {
     return path.trim().split(/[\\/]/);
 }
+
+export function popFirstFolder(path: string) {
+    let splits = splitPath(path);
+    splits.pop();
+    return splits.join("/")
+}

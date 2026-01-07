@@ -55,7 +55,6 @@ function glitch(time: number, callback=() => void 0) {
         originalFilters = null;
     } else {
         Interstellar.graphics.game.filters = transitionFilters;
-
     }
     let audio = transitionSFX[Math.floor(Math.random()*transitionSFX.length)]!!;
     audio.volume = JSON.parse(localStorage.getItem("dredark_user_settings")!!).volume * 0.2;
@@ -68,6 +67,30 @@ function glitch(time: number, callback=() => void 0) {
         if (callback) callback();
     }, time);
 }
+
+export async function glitchEx(time: number, preback: () => Promise<void>, callback: () => Promise<void>) {
+    if (!loaded) return;
+    (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "20%";
+    TransitionGlitchFilter.enabled = true;
+    let originalFilters: any = Interstellar.graphics.game.filters;
+    if (Interstellar.graphics.game.filters == transitionFilters) {
+        originalFilters = null;
+    } else {
+        Interstellar.graphics.game.filters = transitionFilters;
+    }
+    let audio = transitionSFX[Math.floor(Math.random()*transitionSFX.length)]!!;
+    audio.volume = JSON.parse(localStorage.getItem("dredark_user_settings")!!).volume * 0.2;
+    audio.play();
+    let currentTime = Date.now();
+    await preback();
+    let wait = time + (Date.now()-currentTime);
+    if (wait > 0) await new Promise((resolve, _) => { setTimeout(resolve, wait)});
+    (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "100%";
+    if (originalFilters) Interstellar.graphics.game.filters = originalFilters;
+    TransitionGlitchFilter.enabled = false;
+    await callback();
+}
+
 export function updateGlitch() {
     if (TransitionGlitchFilter.enabled) TransitionGlitchFilter.refresh();
 }

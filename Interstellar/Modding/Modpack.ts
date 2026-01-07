@@ -27,6 +27,14 @@ export class Modpack {
     cleanFiles: Function;
     // Inits and prepatches things that needs to be patched
     devpack: boolean = false;
+    assetStoreName: string;
+    internalName: string | undefined;
+
+    constructor(assetStoreName: string, internalName?: string | undefined) {
+        this.assetStoreName = assetStoreName;
+        this.internalName = internalName;
+    }
+
     async initdevpack(getFilesFunction: Function, internal: boolean, cleanFilesFunction: Function, nonvalidation=true) {
         this.devpack = true;
         return await this.init(getFilesFunction, internal, cleanFilesFunction, nonvalidation);
@@ -114,46 +122,11 @@ export class Modpack {
                 backgroundMap.set(background, null);
                 psudoSubzones.push({name, description, background, music, textures, filters, color: subzoneColor, theme});
             }
-            const loadingPromise = [];
             for (const bgConfigPathRaw of backgroundMap.keys()) {
                 const bgConfig: BackgroundConfig = await this.readJson(bgConfigPathRaw);
-                const background = new ModpackZoneBackground(bgConfig.width, bgConfig.height, bgConfig.isPixelArt ?? false);
-                for (const sprite of bgConfig.sprites) {
-                    if (sprite.path) {
-                        const _path = parsePathFromFile(sprite.path, bgConfigPathRaw);
-                        let file = await this.getFile(_path);
-                        if (!file) throw `Failed to find file ${_path}`;
-                        background.addSprite(sprite, file.blob);
-                    } 
-                    else if (sprite.animated) {
-                        if (sprite.animated.sprites) {
-                            let blobs: Blob[] = [];
-                            for (const elm of sprite.animated.sprites) {
-                                const _path = parsePathFromFile(elm, bgConfigPathRaw);
-                                let file = await this.getFile(_path);
-                                if (!file) throw `Failed to find file ${_path}`;
-                                blobs.push(file.blob)
-                            }
-                            background.addAnimatedSprites(sprite, blobs);
-                        } else if (sprite.animated.spritesheet) {
-                            const _blobpath = parsePathFromFile(sprite.animated.spritesheet.image, bgConfigPathRaw);
-                            const _jsonpath = parsePathFromFile(sprite.animated.spritesheet.json, bgConfigPathRaw);
-                            const _blobfile = await this.getFile(_blobpath);
-                            const _jsonfile = await this.getFile(_jsonpath);
-                            if (!_blobfile) throw `Failed to find spritesheet image ${_blobpath}`;
-                            if (!_jsonfile) throw `Failed to find spritesheet image ${_jsonpath}`;
-                            let blob = _blobfile.blob;
-                            let json = _jsonfile.blob;
-                            background.addSpritesheetSprites(sprite, blob, json)
-                        }
-                    } else {
-                        throw "Sprite isn't animated or static."
-                    }
-                }
+                const background = new ModpackZoneBackground(bgConfigPathRaw, bgConfig, this.assetStoreName, bgConfig.width, bgConfig.height, bgConfig.isPixelArt ?? false, this.internalName);
                 backgroundMap.set(bgConfigPathRaw, background);
-                loadingPromise.push(...background.loading)
             }
-            await Promise.all(loadingPromise);
             for (const background of backgroundMap.values()) {
                 background!!.sortSprites();
             }
@@ -235,7 +208,7 @@ export class Modpack {
     }
 }
 
-export async function createModpack(flattened: Record<string, BlobContainer>, internal: boolean): Promise<Modpack> {
+export async function createModpack(flattened: Record<string, BlobContainer>, internal_name: string | undefined, assetStoreName: string): Promise<Modpack> {
     const getFileFunction = async (path: string) => {
         return flattened[path];
     }
@@ -244,5 +217,5 @@ export async function createModpack(flattened: Record<string, BlobContainer>, in
             delete flattened[key];
         }
     }
-    return await (new Modpack()).init(getFileFunction, internal, cleanFilesFunction);
+    return await (new Modpack(assetStoreName, internal_name)).init(getFileFunction, !!internal_name, cleanFilesFunction);
 }
