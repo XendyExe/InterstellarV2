@@ -5,6 +5,7 @@ export abstract class Argument<T> {
     abstract autocomplete(split: string): string[];
     abstract extractValue(split: string): T;
     name: string;
+    greedy: boolean = false;
     constructor(name: string) {
         this.name = name;
     }
@@ -66,6 +67,7 @@ export class StringArgument extends Argument<string> {
 }
 
 export class PlayerArgument extends Argument<string> {
+    greedy = true;
     autocomplete(split: string): string[] {
         if (!StellarAPI.Game.sentCrewControlRequest) {
             StellarAPI.sendPacket({
@@ -266,7 +268,15 @@ class StellarCommandsManager {
             return Object.entries(this.allCommands).filter((elm) => {return elm[0].startsWith(cmd) && !(!Interstellar.isTestDred && elm[1].testOnly) && !(elm[1].requireCaptain && !StellarAPI.isCaptain())}).map(elm => elm[0]);
         } else {
             const cmd = this.findCommand(this.inputSplits[0]!!.toLowerCase());
-            if (!cmd || this.inputSplits.length - 1 > cmd.arguments.length) return [];
+            if (!cmd || this.inputSplits.length - 1 > cmd.arguments.length) {
+                if (cmd) {
+                    let lastArgument = cmd.arguments[cmd.arguments.length - 1];
+                    if (lastArgument?.greedy) {
+                        return lastArgument.autocomplete(this.inputSplits.slice(cmd.arguments.length).join(" "));
+                    }
+                }
+                return [];
+            }
             if (cmd.requireCaptain && !StellarAPI.isCaptain()) return ["$This command requires captain."]
             const argument = cmd.arguments[this.inputSplits.length - 2]!!;
             return argument.autocomplete(this.inputSplits[this.inputSplits.length - 1]!!)
@@ -288,6 +298,11 @@ class StellarCommandsManager {
 
     registerCommand(command: BaseCommand) {
         this.registeredCommands.push((command as unknown) as BaseCommand);
+        let greedy = false;
+        for (const argument of command.arguments) {
+            if (greedy) throw "Attepted to have a argument after a greedy string argument."
+            if (argument.greedy) greedy = true;
+        }
         this.allCommands[command.name] = command
         command.alias.forEach(name => this.allCommands[name] = command);
     }
@@ -334,7 +349,10 @@ class StellarCommandsManager {
             return ""
         }
         try {
-            let args = command.arguments.map((arg, index) => arg.extractValue(splits[index] ?? ""));
+            let args = command.arguments.map((arg, index) => {
+                if (arg.greedy) return arg.extractValue(splits.slice(index).join(" "));
+                else return arg.extractValue(splits[index] ?? "");
+            });
             let commandResult = command.execute(...args);
             return commandResult ?? "";
         } catch (e) {

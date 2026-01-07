@@ -1,6 +1,6 @@
 import { Application, Container, Sprite } from "pixi.js";
 import Patcher from "./Patching/Patcher";
-import { loadTransitionSfx, updateGlitch } from "./Graphical/Transition";
+import glitch, { loadTransitionSfx, updateGlitch } from "./Graphical/Transition";
 import AssetManager, { internalModpackName } from "./StellarAssetManager";
 import { createModpack, Modpack } from "./Modding/Modpack";
 import Zone from "./Graphical/Zone";
@@ -8,7 +8,6 @@ import musicPlayer from "./Music/MusicPlayer";
 import { DebugDrawer } from "./Patching/DebugDrawer";
 import PerformanceMetrics from "./PerformanceMetrics";
 import { Music } from "./Music/Music";
-import PatchUI from "./Patching/PatchUI";
 import { InterstellarSettings } from "./Settings";
 import { switchToTheme } from "./Modding/Theme";
 import { ModpackManager } from "./Modding/ModpackManager";
@@ -25,7 +24,7 @@ import UIEventDispatcher from "./Patching/UIEventDispatcher";
 import StellarCommandsManager from "./API/StellarCommandsManager";import ModpackImporter from "./Modding/ModpackImporter";
 import Devpack from "./API/Devpack";
 import __wbg_init from "@InterstellarInternals";
- StellarCommandsManager;
+StellarCommandsManager;
 
 interface Graphics {
     game: Container,
@@ -77,6 +76,8 @@ class Interstellar {
 
     build: number;
     constructor() {
+        // @ts-ignore
+        window.Interstellar = this;
         let splits = document.getElementById("debugMenuOpener")!!.innerHTML.split(".");
         this.build = Number.parseInt(splits[splits.length - 1]!!);
         let dsaSettings = localStorage.getItem("dredark_user_settings");
@@ -233,6 +234,10 @@ class Interstellar {
             PerformanceMetrics.split(`Loaded ${modpack.config.name} (${modpack.config.id})`);
         }
         delete AssetManager.internal!!["StrawberryJamPack"];
+        console.log(AssetManager.internal);
+        for (const key of Object.keys(textureCache)) {
+            delete textureCache[key];
+        }
         this.fullyLoaded = true;
         PerformanceMetrics.split(`All modpacks loaded`);
         const usedMusic: Music[] = [];
@@ -252,7 +257,6 @@ class Interstellar {
     }
     endTick() {
         if (!this.started) return;
-        PatchUI.setMenuOpacity(this.patcher.gameActive ? this.patcher.zoom : 1);
         let start = performance.now();
         updateGlitch();
         if (this.currentZone) this.currentZone.tick();

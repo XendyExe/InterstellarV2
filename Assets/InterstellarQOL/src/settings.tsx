@@ -3,6 +3,7 @@ import StellarAPI from "@interstellar/StellarAPI";
 import { h, Fragment, Component, Attributes, ComponentChildren, Ref } from "preact";
 import Autoequip, { EquipmentSlot } from "./features/Autoequip";
 import Keybinds, { Keybind } from "./features/Keybinds";
+import ToggleableBillboards from "./features/ToggleableBillboards";
 
 let shouldReload = false;
 class KeybindsComponent extends Component {
@@ -121,7 +122,9 @@ export function setupSettings() {
 }
 
 let enableGrief = (localStorage.getItem("isqol-enableGriefWarnings") ?? "true") == "true";
+let enableNestBillboards = (localStorage.getItem("isqol-enableNestBillboards") ?? "true") == "true";
 StellarAPI.DrednotSettings.setEnableGriefingWarning(enableGrief);
+ToggleableBillboards.enabled = enableNestBillboards;
 export function settingsEventListener(event: RenderSettingsEvent) {
     enableGrief = (localStorage.getItem("isqol-enableGriefWarnings") ?? "true") == "true";
     StellarAPI.UI.preactAppendChild(event.gameplaySettings, 
@@ -141,5 +144,12 @@ export function settingsEventListener(event: RenderSettingsEvent) {
             StellarAPI.DrednotSettings.setEnableGriefingWarning(enable);
             localStorage.setItem("isqol-enableGriefWarnings", enable ? "true" : "false")
         }} checked={enableGrief}/></label></p>
+    </>)
+    StellarAPI.UI.preactInsertBefore(event.displaySettings, interstellarButton, <>
+        <p><label><b>Enable nest billboards: </b><input type="checkbox" onChange={(e) => {
+            const enable = (e.target as HTMLInputElement).checked;
+            localStorage.setItem("isqol-enableNestBillboards", enable ? "true" : "false")
+            ToggleableBillboards.enabled = enable;
+        }} checked={enableNestBillboards}/></label></p>
     </>)
 }

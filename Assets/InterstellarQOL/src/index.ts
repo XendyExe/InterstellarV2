@@ -1,6 +1,6 @@
 import InterstellarScriptingMod from "@interstellar/InterstellarScriptingMod"
 import RejoinButton from "./features/RejoinButton";
-import { RenderSettingsEvent, SocketOpenEvent } from "@interstellar/InterstellarEvents"
+import { RenderSettingsEvent, SocketMessageRecieveEvent, SocketOpenEvent } from "@interstellar/InterstellarEvents"
 import StellarEventManager from "@interstellar/StellarEventManager"
 import { settingsEventListener, setupSettings } from "./settings";
 import CrewCounter from "./features/CrewCounter";
@@ -10,6 +10,10 @@ import DefaultGravity from "./features/DefaultGravity";
 import { Snakecopter } from "./features/Snakecopter";
 import Keybinds from "./features/Keybinds";
 import ClickableLinks from "./features/ClickableLinks";
+import ZoomOpacity from "./features/ZoomOpacity";
+import PaintHelper from "./features/PaintHelper";
+import gravSkates from "./features/GravSkates";
+import hideShip from "./features/HideShip";
 
 export default class InterstellarQOL extends InterstellarScriptingMod {
     rejoinButton = new RejoinButton();
@@ -18,9 +22,12 @@ export default class InterstellarQOL extends InterstellarScriptingMod {
     snakecopter = new Snakecopter();
     keybinds = Keybinds;
     clickableLInks = new ClickableLinks();
+    zoomOpacity = ZoomOpacity;
+    paintHelper = PaintHelper;
+    gravSkates = gravSkates;
+    hideShip = hideShip;
 
     async preload(): Promise<void> {
-        console.log("Hello interstellar QOL!");
         setupSettings();
         StellarEventManager.addEventListener(SocketOpenEvent, this.socketOpen.bind(this));
         StellarEventManager.addEventListener(RenderSettingsEvent, settingsEventListener);
@@ -28,7 +35,12 @@ export default class InterstellarQOL extends InterstellarScriptingMod {
     }
 
     async load(): Promise<void> {
-
+        StellarEventManager.addEventListener(SocketMessageRecieveEvent, (event: SocketMessageRecieveEvent) => {
+            let packet = event.message;
+            if (packet.type == StellarAPI.Packet.SvMsgSnapshot) return;
+            if (packet.type == StellarAPI.Packet.SvMsgWorldBlocks) {
+            }
+        })
     }
 
     socketOpen(event: SocketOpenEvent) {

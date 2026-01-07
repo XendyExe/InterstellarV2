@@ -2,12 +2,11 @@ import { Filter } from "pixi.js";
 import { AdjustmentFilter, RGBSplitFilter, PixelateFilter, GlitchFilter } from "pixi-filters";
 import Interstellar from "../Interstellar";
 import StellarAssetManager from "../StellarAssetManager";
-// @ts-ignore This is world's dumbest workaround but if you control shift t open a tab it will break imports
-if(!window.PIXI || !PIXI.filters)location.reload();
 
 let transitionFilters: Filter[] = [];
 const TransitionAdjustmentFilter = new AdjustmentFilter();
 let TransitionGlitchFilter = new GlitchFilter();
+TransitionGlitchFilter.enabled = false;
 const TransitionPixelateFilter = new PixelateFilter();
 const TransitionRGBSplitFilter = new RGBSplitFilter();
 TransitionAdjustmentFilter.saturation = 0.5;

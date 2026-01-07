@@ -27,7 +27,6 @@ class GravityCommand extends BaseCommand {
     arguments = [new OptionsArgument("direction", Object.keys(this.argToIndex), ["0", "1", "2", "3"])];
     execute(direction: string) {
         InterstellarQOL.logMessage("Changed gravity!");
-        console.log()
         StellarAPI.sendPacket({type: StellarAPI.Packet.ClMsgTeamAct, arg: this.argToIndex[direction], act: "gravity"})
     }
 }
@@ -165,6 +164,8 @@ class CapCommand extends BaseCommand {
         StellarQOL.capPlayer(player);
     }
 }
+
+
 
 class ChangeFireModeCommand extends BaseCommand {
     name = "changefiremode"

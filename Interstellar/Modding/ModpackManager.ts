@@ -2,22 +2,12 @@ import Devpack from "../API/Devpack";
 import Interstellar from "../Interstellar";
 import { InterstellarLoadingScreen } from "../InterstellarLoadingScreen";
 import StellarAssetManager, { AssetStoreData, internalModpackName } from "../StellarAssetManager";
+import { formatBytes } from "../StellarUtils";
 import ModpackConfig from "./ModdingTypes/ModpackConfig";
 import { Modpack } from "./Modpack";
 import ModpackImporter from "./ModpackImporter";
 import { parsePath } from "./PathParser";
 import { createNotification } from "./StellarNotif";
-function formatBytes(bytes: number, decimals = 2): string {
-    if (bytes === 0) return '0 B';
-
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    const value = parseFloat((bytes / Math.pow(k, i)).toFixed(decimals));
-
-    return `${value} ${sizes[i]}`;
-}
-
 function downloadBlob(blob: Blob, filename: string) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

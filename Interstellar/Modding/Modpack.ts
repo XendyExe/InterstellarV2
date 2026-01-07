@@ -65,6 +65,9 @@ export class Modpack {
 
         if (this.config.zones) await this.loadZones(textureCache, nonvalidation);
         await this.cleanFiles();
+        for (const url of Object.values(this.urlCache)) {
+            URL.revokeObjectURL(url);
+        }
         console.log("Unloaded assets from " + this.config.id);
     }
 

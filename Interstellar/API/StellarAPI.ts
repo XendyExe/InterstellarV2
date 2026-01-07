@@ -2,6 +2,8 @@ import { VNode } from "preact";
 import Interstellar from "../Interstellar";
 import { CurrentShipData, PlayerListEntry } from "./Utils";
 import StellarCommandsManager from "./StellarCommandsManager";
+import Patcher from "../Patching/Patcher";
+import parseColor from "../Modding/ColorParser";
 
 class InterstellarUIAPI {
     settingModels: Record<string, VNode> = {};
@@ -223,6 +225,27 @@ class InterstellarGameAPI {
     leaveShip(): any {
         // @ts-ignore
         window.returnToMenu();
+    }
+
+    getZoom(): number {
+        return Patcher.gameActive ? Patcher.zoom : 1
+    }
+
+    getColor(x: number, y: number): number {
+        let local_world = this.getLocalWorld();
+        if (!local_world) return -1;
+        return local_world.map.get_color(x, y);
+    }
+
+    setColor(x: number, y: number, color: number) {
+        let local_world = this.getLocalWorld();
+        // paint { overflow: hidden; }
+        if (!local_world || x < 0 || y < 0 || x >= local_world.block_w || y >= local_world.block_h) return;
+        local_world.map.set_color(x, y, color);
+    }
+
+    drawText(text: string, x: number, y: number, color: number | string, size: number | undefined) {
+        return Patcher.graphics.graphics.drawText(text, x, y, typeof color == "string" ? parseColor(color) : color, size);
     }
 }
 

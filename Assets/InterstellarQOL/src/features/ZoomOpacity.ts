@@ -1,4 +1,6 @@
-import { clamp } from "../StellarUtils";
+import { TriggerEvent } from "@interstellar/InterstellarEvents";
+import StellarAPI from "@interstellar/StellarAPI";
+import StellarEventManager from "@interstellar/StellarEventManager";
 
 interface Elements {
     chat: HTMLDivElement;
@@ -7,7 +9,10 @@ interface Elements {
     bottom: HTMLDivElement;
     top: HTMLDivElement;
 }
-class UIPatcher {
+function clamp(num: number, min: number, max: number) {
+    return Math.max(Math.min(num, max), min)
+}
+class ZoomOpacity {
     elements: Elements;
     overrideOpacity = 1;
     constructor() {
@@ -40,9 +45,12 @@ class UIPatcher {
             if (bottomPer > 0.1) bottomPer = 0.1;
             this.overrideOpacity = Math.max(bottomPer, topPer, motdPer) * 10;
         });
+
+        StellarEventManager.addTriggerListener(TriggerEvent.FRAME_END, this.tick.bind(this));
     }
 
-    setMenuOpacity(zoom: number) {
+    tick() {
+        let zoom = StellarAPI.Game.getZoom();
         zoom += this.overrideOpacity;
         let minZoom = clamp(zoom * 100 + 20, 0, 100)
         zoom = clamp(zoom * 100, 0, 100);
@@ -58,6 +66,7 @@ class UIPatcher {
         this.elements.bottom.style.opacity = `${zoom}%`;
         this.elements.top.style.opacity = `${zoom}%`;
     }
+       
 }
 
-export default new UIPatcher();
+export default new ZoomOpacity();

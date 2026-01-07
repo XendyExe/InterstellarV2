@@ -6,49 +6,43 @@ import { createNotification } from "../Modding/StellarNotif";
 import StellarAssetManager from "../StellarAssetManager";
 import { Music } from "./Music";
 
-export interface MusicCache {
-    used: boolean;
-    length: number;
-    entries: number;
-    name: string;
+export interface MusicDebugData {
+    name: string,
+    started: boolean,
+    time: bigint,
+    length: bigint,
+    playing: boolean,
+    pause_time_song?: bigint,
+    pause_time_start?: bigint,
+    buffer_length: number,
+    resampler: boolean,
+    active: boolean,
+    unloading: boolean
 }
 
-const workletCode = `
-class TickProcessor extends AudioWorkletProcessor {
-  constructor() {
-    super();
-    this.framesUntilTick = 0;
-    this.framesPerTick = sampleRate * 0.05; // 20 Hz
-  }
-
-  process(inputs, outputs) {
-    this.framesUntilTick += 128;
-
-    if (this.framesUntilTick >= this.framesPerTick) {
-      this.framesUntilTick -= this.framesPerTick;
-
-      // Audio-context time when tick occurred
-      const tickTime = currentTime;
-      this.port.postMessage(tickTime);
-    }
-
-    return true;
-  }
+export interface ProcessorDebugData {
+    memory: number,
+    loaded_songs: MusicDebugData[]
 }
 
-registerProcessor('tick-20hz', TickProcessor);
-`;
 
 class MusicPlayer {
     audioContext: AudioContext;
+    requestDebugData: boolean = false;
+    private debugCounter = 0;
     private pendingPlay: Music | null = null;
     private isUnlocked: boolean = false;
     musics: Music[] = [];
-    loader: Promise<void>;
     ready = false;
+    current_index = 0;
+    loadedPromise: Promise<any>;
+    private _loadedResolve: any;
+    debug_data: ProcessorDebugData | null = null; 
 
-    musicCacheDB: IDBDatabase | undefined;
-    musicCache: Record<string, MusicCache> = {};
+    node: AudioWorkletNode | null = null;
+
+    set_master_volume = 0;
+    set_focused = false;
 
     async waitUntilReady(): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -62,158 +56,56 @@ class MusicPlayer {
 
     constructor() {
         this.audioContext = new AudioContext({sampleRate: 48000});
-        this.loader = this.setupAudioCache();
         this.setupUnlockListeners();
+        this.loadedPromise = new Promise((resolve, _) => {this._loadedResolve = resolve; })
     }
     async loadMusic(toBeLoaded: Music[]) {
-        const blob = new Blob([workletCode], { type: 'application/javascript' });
+        let initResolve: any, initReject: any;
+        const initPromise = new Promise((resolve, reject) => {
+            initResolve = resolve;
+            initReject = reject;
+        });
+
+        let blob = new Blob([StellarAssetManager.internal!!["music/worklet.js"]!!.blob], {type:"text/javascript"});
         const url = URL.createObjectURL(blob);
+        console.log(url);
         await this.audioContext.audioWorklet.addModule(url);
-        const node = new AudioWorkletNode(this.audioContext, 'tick-20hz');
-        node.port.onmessage = (e) => {
-            this.tick(0.05);
+
+
+        const wasmResponse = StellarAssetManager.internal!!["music/music.wasm"]!!.blob
+        const wasmBytes = await wasmResponse.arrayBuffer();
+        this.node = new AudioWorkletNode(this.audioContext, 'interstellar-music', {
+            outputChannelCount: [2]
+        });
+        console.log(this.node);
+        this.node.port.onmessage = (e) => {
+            if (e.data.type === 'initialized') {
+                initResolve();
+            } else if (e.data.type === 'error') {
+                initReject(e.data.error);
+            } else if (e.data.type === "tick") {
+                this.tick(0.05);
+            } else if (e.data.type === "debug") {
+                this.debug_data = e.data.data;
+            }
         };
 
-        const progress = new InterstellarLoadingScreen("Caching music...", "Setting up audio cache...");
-        await this.setupAudioCache();
-        let count = 0;
-        let total = toBeLoaded.length;
-        progress.setProgress(count, total);
-        for (const music of toBeLoaded) {
-            progress.setTitle(`Caching music (${count + 1}/${total})`)
-            await music.load(progress);
-            count += 1;
-            progress.setProgress(count, total);
+        this.node.port.postMessage({
+            type: 'init',
+            wasmBytes: wasmBytes
+        });
+        this.node.connect(this.audioContext.destination);
+        await initPromise;
+        // @ts-ignore
+        window.queryInternalMusic = () => {
+            this.node!!.port.postMessage({type: "debug"})
         }
-        progress.setDescription("Pruning Audio Cache: Opening database")
-        await this.pruneAudioCache(progress);
-        progress.complete();
         this.ready = true;
-    }
-
-    async setupAudioCache() {
-        await new Promise((resolve, reject) => {
-            const request = indexedDB.open("musiccache");
-            request.onupgradeneeded = (event) => {
-                this.musicCacheDB = request.result;
-            };
-            request.onsuccess = () => {
-                this.musicCacheDB = request.result;
-                resolve(request.result);
-            };
-            request.onerror = () => {
-                throw `Failed to create music cache database! Your browser may not be compatable!\n ${request.error}`;
-            };
-        });
-        const objectStores = this.musicCacheDB?.objectStoreNames;
-        if (objectStores) for (const hash of objectStores) {
-            const transaction = this.musicCacheDB!.transaction(hash, "readonly");
-            const store = transaction.objectStore(hash);
-            const request = store.get("manifest");
-            const manifest: any = await new Promise((resolve, reject) => {
-                request.onsuccess = () => resolve( request.result );
-                request.onerror = reject;
-            })!;
-            this.musicCache[hash] = {
-                used: false,
-                length: manifest.length,
-                entries: manifest.entries,
-                name: manifest.name
-            }
-        }
-    }
-    async pushCache(name: string, hash: string, length: number, left: Int16Array[], right: Int16Array[]) {
-        const currentVersion = this.musicCacheDB?.version || 1;
-        this.musicCacheDB?.close();
-        const newVersion = currentVersion + 1;
-        this.musicCacheDB = await new Promise((resolve, reject) => {
-            const request = indexedDB.open("musiccache", newVersion);
-            request.onupgradeneeded = (event) => {
-                const db = request.result;
-                if (!db.objectStoreNames.contains(hash)) {
-                    db.createObjectStore(hash);
-                }
-            };
-            request.onsuccess = () => {
-                this.musicCacheDB = request.result;
-                resolve(request.result);
-            };
-            request.onerror = () => reject(request.error);
-        });
-        const transaction = this.musicCacheDB!.transaction(hash, "readwrite");
-        const store = transaction.objectStore(hash);
-        const request = store.put({
-            length: length,
-            entries: left.length,
-            name: name
-        }, "manifest");
-        this.musicCache[hash] = {
-            used: false,
-            length: length,
-            entries: left.length,
-            name: name
-        }
-        let tasks = [new Promise((resolve, reject) => {
-            request.onsuccess = () => resolve( request.result );
-            request.onerror = reject;
-        })!];
-        for (let i = 0; i < left.length; i++) {
-            tasks.push(this.putIntoStore(store, i.toString(), [left[i], right[i]]));
-        }
-        await Promise.all(tasks);
-    }
-    async putIntoStore(store: IDBObjectStore, key: string, value: any) {
-        return new Promise((resolve, reject) => {
-            let request = store.put(value, key);
-            request.onsuccess = resolve;
-            request.onerror = reject;
-        })
-    }
-    async pruneAudioCache(loading: InterstellarLoadingScreen) {
-        let remove = []
-        for (const hash of Object.keys(this.musicCache)) {
-            if (!this.musicCache[hash]?.used) {
-                remove.push(hash);
-            }
-        }
-        if (remove.length > 0) {
-            const currentVersion = this.musicCacheDB!.version;
-            this.musicCacheDB?.close();
-            
-            const newVersion = currentVersion + 1;
-            
-            await new Promise((resolve, reject) => {
-                const request = indexedDB.open("musiccache", newVersion);
-                
-                request.onupgradeneeded = (event) => {
-                    const db = request.result;
-                    let count = 0;
-                    let total = remove.length;
-                    loading.setDescription(`Pruning Audio Cache: Deleting object stores (${count}/${total})`)
-                    loading.setProgress(count, total);
-                    for (const hash of remove) {
-                        db.deleteObjectStore(hash);
-                        delete this.musicCache[hash];
-                        count++;
-                        loading.setDescription(`Pruning Audio Cache: Deleting object stores (${count}/${total})`)
-                        loading.setProgress(count, total);
-                    }
-                };
-                
-                request.onsuccess = () => {
-                    this.musicCacheDB = request.result;
-                    resolve(request.result);
-                };
-                
-                request.onerror = () => reject(request.error);
-            });
-
-        }
+        this._loadedResolve();
     }
 
     private setupUnlockListeners(): void {
         const unlockEvents = ["click", "touchstart", "keydown"];
-
         const tryUnlock = async () => {
             if (this.isUnlocked) return;
 
@@ -253,18 +145,28 @@ class MusicPlayer {
     }
 
     tick(dt: number) {
-        const adjusteddt = dt / 0.05;
         const focused = document.hasFocus() && document.visibilityState == "visible";
+        this.debugCounter++;
+        if (this.debugCounter >= 5) {
+            if (this.requestDebugData) {
+                this.requestDebugData = false;
+                this.node!!.port.postMessage({type: "debug", focus: focused});
+            }
+            else if (this.debug_data != null) this.debug_data = null;
+        }
+        if (focused !== this.set_focused) {
+            this.node!!.port.postMessage({type: "focus", focus: focused});
+            this.set_focused = focused;
+        }
+        if (Interstellar.settingsManager.settings.musicVolume != this.set_master_volume) {
+            this.node!!.port.postMessage({type: "master_volume", volume: Interstellar.settingsManager.settings.musicVolume});
+            this.set_master_volume = Interstellar.settingsManager.settings.musicVolume
+        }
         for (let music of this.musics) {
-            music.tick(adjusteddt, focused, Interstellar.settingsManager.settings.musicVolume);
+            music.tick();
         }
         StellarEventManager.dispatchTrigger(TriggerEvent.CONSTANT_TICK);
     }
-
-    async checkCache(id: string) {
-        await this.loader;
-    }
-
 }
 
 const musicPlayer = new MusicPlayer();

@@ -2,7 +2,7 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _a;
+var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupSettings = setupSettings;
 exports.settingsEventListener = settingsEventListener;
@@ -10,6 +10,7 @@ const StellarAPI_1 = __importDefault(require("@interstellar/StellarAPI"));
 const preact_1 = require("preact");
 const Autoequip_1 = __importDefault(require("./features/Autoequip"));
 const Keybinds_1 = __importDefault(require("./features/Keybinds"));
+const ToggleableBillboards_1 = __importDefault(require("./features/ToggleableBillboards"));
 let shouldReload = false;
 class KeybindsComponent extends preact_1.Component {
     keybindsEntry(props) {
@@ -122,7 +123,9 @@ function setupSettings() {
     StellarAPI_1.default.UI.registerSettingsModel("isqol-autoequip", (0, preact_1.h)(AutoequipComponent, null));
 }
 let enableGrief = ((_a = localStorage.getItem("isqol-enableGriefWarnings")) !== null && _a !== void 0 ? _a : "true") == "true";
+let enableNestBillboards = ((_b = localStorage.getItem("isqol-enableNestBillboards")) !== null && _b !== void 0 ? _b : "true") == "true";
 StellarAPI_1.default.DrednotSettings.setEnableGriefingWarning(enableGrief);
+ToggleableBillboards_1.default.enabled = enableNestBillboards;
 function settingsEventListener(event) {
     var _a;
     enableGrief = ((_a = localStorage.getItem("isqol-enableGriefWarnings")) !== null && _a !== void 0 ? _a : "true") == "true";
@@ -143,4 +146,13 @@ function settingsEventListener(event) {
                         StellarAPI_1.default.DrednotSettings.setEnableGriefingWarning(enable);
                         localStorage.setItem("isqol-enableGriefWarnings", enable ? "true" : "false");
                     }, checked: enableGrief })))));
+    StellarAPI_1.default.UI.preactInsertBefore(event.displaySettings, interstellarButton, (0, preact_1.h)(preact_1.Fragment, null,
+        (0, preact_1.h)("p", null,
+            (0, preact_1.h)("label", null,
+                (0, preact_1.h)("b", null, "Enable nest billboards: "),
+                (0, preact_1.h)("input", { type: "checkbox", onChange: (e) => {
+                        const enable = e.target.checked;
+                        localStorage.setItem("isqol-enableNestBillboards", enable ? "true" : "false");
+                        ToggleableBillboards_1.default.enabled = enable;
+                    }, checked: enableNestBillboards })))));
 }

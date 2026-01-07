@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Interstellar",
-  "version": "2",
+  "version": "2.1",
   "description": "Interstellar mod for drednot.io",
   "permissions": ["scripting", "tabs"],
   "host_permissions": ["https://*.drednot.io/*", "http://localhost:9000/*"],

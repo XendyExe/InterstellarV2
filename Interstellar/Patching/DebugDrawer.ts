@@ -1,6 +1,7 @@
 import parseColor from "../Modding/ColorParser";
 import musicPlayer from "../Music/MusicPlayer";
 import PerformanceMetrics, { stellarFormatLoadTimes } from "../PerformanceMetrics";
+import { formatBytes, roundTo } from "../StellarUtils";
 
 // MOST CODE EVER SHUT UP.
 // @ts-ignore
@@ -23,6 +24,20 @@ export function LoadDebugRequires() {
 }
 const x = 500;
 const color = parseColor("#ff94bd");
+
+function format_music_samples(samples: bigint) {
+    const ms = Number(samples) / 48;
+    let totalSeconds = Math.floor(ms / 1000);
+    let hours = Math.floor(totalSeconds / 3600);
+    let minutes = Math.floor((totalSeconds % 3600) / 60);
+    let seconds = Math.floor(totalSeconds % 60);
+    let result = ""
+    if (hours) result += `${hours}:`
+    result += `${minutes}:`.padStart(3, "0");
+    result += `${seconds}`.padStart(2, "0");
+    return result;
+}
+
 export class DebugDrawer {
     frameTimeTotal: number = 0;
     interstellarFrameTime: number = 0;
@@ -59,20 +74,27 @@ export class DebugDrawer {
             Graphics.drawTextSS(`Relay: cpu = ${relay.cpu_load}%`, x, 210, color, 10)
         }
         Graphics.drawTextSS("Interstellar Music: ", x, 240, color, 14);
+        musicPlayer.requestDebugData = true;
         let musicY = 260;
-        for (let music of musicPlayer.musics) {
-            if (!music.playing && !music.active) continue;
-
-            let tags = "";
-            if (music.getTickLock()) tags += "T"
-            if (music.activating) tags += "A"
-            if (music.focusVolume == 0) tags += "V"
-            if (music.fadeVolume == 0) tags += "F"
-        
-            if (tags != "") tags = "[" + tags + "]"
-            if (music.playing) Graphics.drawTextSS(`[Playing] ${tags} ${music.name}: t=${music.currentTime.toFixed(2)} load=${stellarFormatLoadTimes(music.lastChunkLoadTime)} buff#=${music.lastLoadedBuffer} // ${music.ticker}`, x, musicY, color, 10);
-            else if (music.active) Graphics.drawTextSS(`[Idle] ${tags} ${music.name} // ${music.ticker}`, x, musicY, color, 10);
-            musicY += 20;
+        if (musicPlayer.debug_data == null) {
+            Graphics.drawTextSS(`Loading processor debug data...`, x, musicY, color, 10);
+        } else {
+            Graphics.drawTextSS(`Memory usage: ${formatBytes(musicPlayer.debug_data.memory)}`, x, musicY, color, 10);
+        }
+        musicY += 20;
+        if (musicPlayer.debug_data != null) {
+            for (let music of musicPlayer.debug_data.loaded_songs) {
+                let result = `${music.name}: ${format_music_samples(music.time)} - ${format_music_samples(music.length)} // Avg. Buff=${Math.floor(music.buffer_length)}/4096`;
+                let tags = ""
+                if (music.active) tags += "A"
+                if (music.unloading) tags += "U"
+                if (music.playing) tags += "P"
+                if (music.resampler) tags += "R"
+                if (tags != "") tags = "[" + tags + "] "
+                result = tags + result
+                Graphics.drawTextSS(result, x, musicY, color, 10);
+                musicY += 20;
+            }
         }
         
         if (ship != null) {

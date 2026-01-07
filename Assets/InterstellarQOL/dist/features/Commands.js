@@ -68,7 +68,6 @@ class GravityCommand extends StellarCommandsManager_1.BaseCommand {
     }
     execute(direction) {
         __1.default.logMessage("Changed gravity!");
-        console.log();
         StellarAPI_1.default.sendPacket({ type: StellarAPI_1.default.Packet.ClMsgTeamAct, arg: this.argToIndex[direction], act: "gravity" });
     }
 }

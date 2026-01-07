@@ -5,6 +5,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@types/msgpack": "^0.0.34",
     "@types/msgpack-lite": "^0.1.12",
     "pixi-filters": "^6.1.4",
     "preact": "^10.28.0"

@@ -1,11 +1,12 @@
 import { get_internals, give_world_manager } from "@InterstellarInternals";
-import { ChatCloseEvent, ChatMessageRecieveEvent, ChatMessageSendEvent, CrewListUpdateEvent, JoinShipEvent, JoinShipRequestEvent, ProcessMOTDEvent, SocketCloseEvent, SocketMessageRecieveEvent, SocketOpenEvent, TriggerEvent } from "../API/InterstellarEvents";
+import { AdvertClickEvent, ChatCloseEvent, ChatMessageRecieveEvent, ChatMessageSendEvent, CrewListUpdateEvent, JoinShipEvent, JoinShipRequestEvent, ProcessAdvertsEvent, ProcessMOTDEvent, RenderAdvertsEvent, RenderPassOneEvent, RenderPassThreeEvent, RenderPassTwoEvent, SocketCloseEvent, SocketMessageRecieveEvent, SocketOpenEvent, TriggerEvent } from "../API/InterstellarEvents";
 import StellarAPI from "../API/StellarAPI";
 import StellarCommandsManager from "../API/StellarCommandsManager";
 import StellarEventManager from "../API/StellarEventManager";
 import Interstellar from "../Interstellar";
 import { DREDNOT_ZONES } from "../StellarConstants";
 import { DebugDrawer, LoadDebugRequires } from "./DebugDrawer";
+
 
 const joinShipServerMessage = /Joined ship '(.*?)' {([0-9A-F]+)}$/
 const joinMessage = /(\[(Captain|Crew)\])?(#?[a-zA-Z0-9-_ ]+) joined the ship\./;
@@ -33,6 +34,7 @@ class Patcher {
     socketmsgtypes: any = require("SocketMsgTypes");
     htmluifunctions: any;
     textformatter: any;
+    graphics: any;
     // @ts-ignore
     usersettingsmanager: any = require("UserSettingManager");;
     gameActive = false;
@@ -56,11 +58,14 @@ class Patcher {
         this.inputManager = require("InputManager");
         // @ts-ignore
         this.worldManager = require("WorldManager");
+        // @ts-ignore
         give_world_manager(this.worldManager);
         // @ts-ignore
         this.accountManager = require("AccountManager");
         // @ts-ignore
         this.htmluifunctions = require("HTMLUIFunctions");
+        // @ts-ignore
+        this.graphics = require("Graphics");
         // @ts-ignore
         this.textformatter = require("TextFormatter");
         this.interstellarInternals = get_internals();
@@ -73,13 +78,6 @@ class Patcher {
 
     getNavDestination() {
         return this.interstellarInternals.nav_destination;
-    }
-
-    getPlayerPosition() {
-        return {
-            x: this.interstellarInternals.px,
-            y: this.interstellarInternals.py
-        }
     }
 
     toggleUIPatch(model: string, current: any) {
@@ -193,7 +191,14 @@ class Patcher {
             StellarAPI.Game.cachedPlayers.clear();
         }
         return !e.isCanceled();
+    }    
+    getPlayerPosition() {
+        return {
+            x: this.interstellarInternals.px,
+            y: this.interstellarInternals.py
+        }
     }
+
 
     patchNavNames(zone: number) {
         const index = DREDNOT_ZONES[zone];
@@ -274,6 +279,42 @@ class Patcher {
         this.loadRequires();
         LoadDebugRequires();
         Interstellar.debugDrawer = new DebugDrawer();
+    }
+
+    renderAdverts(): boolean {
+        let e = new RenderAdvertsEvent();
+        e.dispatch();
+        return !e.isCanceled();
+    }
+
+    processAdverts(data: any) {
+        (new ProcessAdvertsEvent(data)).dispatch();
+    }
+
+    clickAdverts(url: string, hover_sign: any) {
+        let e = new AdvertClickEvent(url, hover_sign);
+        e.dispatch();
+        return e.isCanceled() ? null : e.url;
+    }
+
+    drawOnTop() {
+        StellarEventManager.dispatchTrigger(TriggerEvent.DRAW_TOP);
+    }
+
+    rp1(world: any) {
+        let e = new RenderPassOneEvent(world);
+        e.dispatch();
+        return !e.isCanceled()
+    }
+    rp2(world: any) {
+        let e = new RenderPassTwoEvent(world);
+        e.dispatch();
+        return !e.isCanceled()
+    }
+    rp3(world: any) {
+        let e = new RenderPassThreeEvent(world);
+        e.dispatch();
+        return !e.isCanceled()
     }
 }
 export default new Patcher();

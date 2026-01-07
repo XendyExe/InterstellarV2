@@ -7,7 +7,8 @@ export enum TriggerEvent {
     FRAME_START,
     FRAME_END,
     LOAD,
-    CONSTANT_TICK
+    CONSTANT_TICK,
+    DRAW_TOP
 }
 
 export abstract class BaseEvent {
@@ -168,6 +169,35 @@ export class ProcessMOTDEvent extends BaseEvent {
 }
 
 export class RenderInventoryEvent extends UIEvent {}
+export class RenderAdvertsEvent extends CancelableEvent {}
+export class ProcessAdvertsEvent extends BaseEvent {
+    data: any;
+    constructor(data: any) {
+        super(); 
+        this.data = data;
+    }
+}
+export class AdvertClickEvent extends CancelableEvent {
+    url: string;
+    hover_sign: any;
+    constructor(url: string, hover_sign: any) {
+        super();
+        this.url = url;
+        this.hover_sign = hover_sign;
+    }
+}
+
+export abstract class RenderPassEvent extends CancelableEvent {
+    world: any;
+    constructor(world: any) {
+        super();
+        this.world = world;
+    }
+}
+
+export class RenderPassOneEvent extends RenderPassEvent {}
+export class RenderPassTwoEvent extends RenderPassEvent {}
+export class RenderPassThreeEvent extends RenderPassEvent {}
 
 export function createEventExports() {
     const exports: Record<string, any> = {};
@@ -200,5 +230,14 @@ export function createEventExports() {
 
     exports.RenderInventoryEvent = RenderInventoryEvent;
     exports.InventoryChangeEvent = InventoryChangeEvent;
+
+    exports.RenderAdvertsEvent = RenderAdvertsEvent;
+    exports.ProcessAdvertsEvent = ProcessAdvertsEvent;
+    exports.AdvertClickEvent = AdvertClickEvent;
+
+    exports.RenderPassEvent = RenderPassEvent;
+    exports.RenderPassOneEvent = RenderPassOneEvent;
+    exports.RenderPassTwoEvent = RenderPassTwoEvent;
+    exports.RenderPassThreeEvent = RenderPassThreeEvent;
     return exports;
 }

@@ -51,6 +51,7 @@ class Zone {
     }
 
     createZone() {
+        console.log("Creating zone", this.displayName);
         this.active = true;
         this.subzones[this.currentIndex]?.background.onSwitch();
         for (let i = 0; i < this.subzones.length; i++) {
