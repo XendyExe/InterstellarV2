@@ -5,19 +5,19 @@
     "sprites": [
         {
             "path": "./fghills.png",
-            "tile": "xy",
+            "tile": "x",
             "px": 0.1,
             "y": -25
         },
         {
             "path": "./mghills.png",
-            "tile": "xy",
+            "tile": "x",
             "px": 0.05,
             "y": -25
         },
         {
             "path": "./puffycloud.png",
-            "tile": "xy",
+            "tile": "x",
             "mx": 1,
             "mt": 0.2,
             "y": -10

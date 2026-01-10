@@ -1,8 +1,6 @@
-import { Filter } from "pixi.js/lib/filters/Filter";
-import { ModpackZoneBackground } from "../Graphical/ModpackZoneBackground";
 import Zone, { SubZone } from "../Graphical/Zone";
 import Interstellar from "../Interstellar";
-import { BackgroundConfig, BackgroundSprite } from "./ModdingTypes/BackgroundConfig";
+import { BackgroundConfig } from "./ModdingTypes/BackgroundConfig";
 import ModpackConfig from "./ModdingTypes/ModpackConfig";
 import { PsudoSubzone, SubzoneConfig, ZoneConfig } from "./ModdingTypes/ZoneConfig";
 import CycleZone from "../Graphical/CycleZone";
@@ -14,6 +12,7 @@ import { parsePath, parsePathFromFile } from "./PathParser";
 import { loadScriptingMod } from "./ScriptingModLoader";
 import { BlobContainer } from "../API/Utils";
 import InterstellarScriptingMod from "../API/InterstellarScriptingMod";
+import { WebGLZoneBackground } from "../Graphical/WebGLZoneBackground";
 
 export class Modpack {
     // @ts-ignore
@@ -89,7 +88,7 @@ export class Modpack {
             if (!defaultName || !defaultDescription) throw "Zones must have a name and description";
 
             const psudoSubzones: PsudoSubzone[] = [];
-            const backgroundMap: Map<string, ModpackZoneBackground | null> = new Map();
+            const backgroundMap: Map<string, WebGLZoneBackground | null> = new Map();
             let configMusic: Music | null = null;
             if (config.music) {
                 let path = parsePathFromFile(config.music, configPath);
@@ -124,25 +123,22 @@ export class Modpack {
             }
             for (const bgConfigPathRaw of backgroundMap.keys()) {
                 const bgConfig: BackgroundConfig = await this.readJson(bgConfigPathRaw);
-                const background = new ModpackZoneBackground(bgConfigPathRaw, bgConfig, this.assetStoreName, bgConfig.width, bgConfig.height, bgConfig.isPixelArt ?? false, this.internalName);
+                const background = new WebGLZoneBackground(bgConfigPathRaw, bgConfig, this.assetStoreName, bgConfig.width, bgConfig.height, bgConfig.isPixelArt ?? false, this.internalName);
                 backgroundMap.set(bgConfigPathRaw, background);
-            }
-            for (const background of backgroundMap.values()) {
-                background!!.sortSprites();
             }
             const subzones: SubZone[] = [];
             for (const subzone of psudoSubzones) {
-                const filters: Filter[] = [];
-                for (const [filterName, filterProperties] of Object.entries(subzone.filters)) {
-                    // @ts-ignore
-                    const filterClass = PIXI.filters[filterName];
-                    // @ts-ignore
-                    const filter = new filterClass();
-                    for (const [propName, propValue] of Object.entries(filterProperties)) {
-                        filter[propName] = propValue;
-                    }
-                    filters.push(filter);
-                }
+                // const filters: Filter[] = [];
+                // for (const [filterName, filterProperties] of Object.entries(subzone.filters)) {
+                //     // @ts-ignore
+                //     const filterClass = PIXI.filters[filterName];
+                //     // @ts-ignore
+                //     const filter = new filterClass();
+                //     for (const [propName, propValue] of Object.entries(filterProperties)) {
+                //         filter[propName] = propValue;
+                //     }
+                //     filters.push(filter);
+                // }
                 
                 const bg = backgroundMap.get(subzone.background);
                 const textures = new Textures();
@@ -161,7 +157,7 @@ export class Modpack {
                     name: subzone.name,
                     description: subzone.description,
                     background: bg!!,
-                    filter: filters,
+                    // filter: filters,
                     textures: textures,
                     music: subzone.music,
                     color: subzone.color,

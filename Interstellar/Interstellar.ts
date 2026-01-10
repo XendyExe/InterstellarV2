@@ -1,4 +1,3 @@
-import { Application, Container, Sprite } from "pixi.js";
 import Patcher from "./Patching/Patcher";
 import glitch, { loadTransitionSfx, updateGlitch } from "./Graphical/Transition";
 import AssetManager, { internalModpackName } from "./StellarAssetManager";
@@ -24,21 +23,16 @@ import UIEventDispatcher from "./Patching/UIEventDispatcher";
 import StellarCommandsManager from "./API/StellarCommandsManager";import ModpackImporter from "./Modding/ModpackImporter";
 import Devpack from "./API/Devpack";
 import __wbg_init from "@InterstellarInternals";
+import { LOADED_TEXTURES } from "./Modding/Textures";
+import { gl } from "./Graphical/WebGLHelpers";
 StellarCommandsManager;
 
-interface Graphics {
-    game: Container,
-    background: Container,
-    drednot_sprite: Sprite
-}
 
 type Modpacks = Modpack | TexturePack
 
 /* Interstellar Main */
 class Interstellar {
-    application: Application;
     drednotCanvas: HTMLCanvasElement;
-    graphics: Graphics;
     patcher = Patcher;
     settingsManager: InterstellarSettings = new InterstellarSettings();
     api = StellarAPI
@@ -56,12 +50,9 @@ class Interstellar {
     canonicalZone: string = "";
     font: FontFace | undefined;
     
-    appStartPromise: Promise<void>;
     started: boolean = false;
     fullyLoaded: boolean = false;
     currentZone: Zone | null = null;
-    lastCanvasWidth: number = 0;
-    lastCanvasHeight: number = 0;
 
     debugMenu = new DebugMenu();
     isFirefox: boolean = false;
@@ -88,30 +79,6 @@ class Interstellar {
         const gameContainer = document.querySelector("#game-container")!! as HTMLDivElement;
         gameContainer.oncontextmenu = () => {return false};
         this.drednotCanvas = document.querySelector("#canvas-game")!! as HTMLCanvasElement;
-        const interstellarCanvas = document.createElement("canvas");
-        interstellarCanvas.oncontextmenu = () => {return false}
-        interstellarCanvas.style.pointerEvents = "none";
-        this.drednotCanvas.parentNode!!.insertBefore(interstellarCanvas, this.drednotCanvas);
-        this.drednotCanvas.style.opacity = "0";
-
-        this.application = new Application();
-        this.appStartPromise = this.application.init({
-            view: interstellarCanvas,
-            resizeTo: window,
-            autoStart: false
-        })
-        this.graphics = {
-            game: new Container(),
-            background: new Container(),
-            drednot_sprite: Sprite.from(this.drednotCanvas)
-        };
-        this.graphics.drednot_sprite.texture.source.alphaMode = "premultiplied-alpha"
-        this.graphics.drednot_sprite.zIndex = 0;
-        this.graphics.background.zIndex = -100;
-        this.graphics.game.addChild(this.graphics.drednot_sprite);
-        this.graphics.game.addChild(this.graphics.background);
-        this.graphics.game.sortChildren();
-        this.application.stage.addChild(this.graphics.game);
     }
     init() {
         switchToTheme({});
@@ -208,7 +175,6 @@ class Interstellar {
         }
 
         PerformanceMetrics.split("Internal Modpack creation");
-        await this.appStartPromise;
         this.modpackManager.init();
         PerformanceMetrics.end();
         PerformanceMetrics.pushBlankLine();
@@ -256,6 +222,13 @@ class Interstellar {
         PerformanceMetrics.split(`Finished loading music!`);
         PerformanceMetrics.end();
 
+        let texture_mem = 0;
+        LOADED_TEXTURES.forEach(textureBlob => {
+            texture_mem += textureBlob.size;
+        });
+        LOADED_TEXTURES.clear();
+        LOADED_TEXTURES.memory = texture_mem;
+
         // Delete musiccache if still exists
         console.log("Deleting musiccache");
         await new Promise<void>((resolve, reject) => {
@@ -268,27 +241,85 @@ class Interstellar {
         });
         console.log("Done!");
     }
+
+
+    frameTime: number = 0;
+    drawBackgrounds() {
+        this.frameTime = 0;
+        if (!this.currentZone) return;
+        let start = performance.now();
+        const state = {
+            program: gl.getParameter(gl.CURRENT_PROGRAM),
+            arrayBuffer: gl.getParameter(gl.ARRAY_BUFFER_BINDING),
+            texture: gl.getParameter(gl.TEXTURE_BINDING_2D),
+            activeTexture: gl.getParameter(gl.ACTIVE_TEXTURE),
+            // Save vertex attribute state
+            vertexAttrib0: {
+                enabled: gl.getVertexAttrib(0, gl.VERTEX_ATTRIB_ARRAY_ENABLED),
+                buffer: gl.getVertexAttrib(0, gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING),
+                size: gl.getVertexAttrib(0, gl.VERTEX_ATTRIB_ARRAY_SIZE),
+                stride: gl.getVertexAttrib(0, gl.VERTEX_ATTRIB_ARRAY_STRIDE),
+                offset: gl.getVertexAttribOffset(0, gl.VERTEX_ATTRIB_ARRAY_POINTER)
+            },
+            vertexAttrib1: {
+                enabled: gl.getVertexAttrib(1, gl.VERTEX_ATTRIB_ARRAY_ENABLED),
+                buffer: gl.getVertexAttrib(1, gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING),
+                size: gl.getVertexAttrib(1, gl.VERTEX_ATTRIB_ARRAY_SIZE),
+                stride: gl.getVertexAttrib(1, gl.VERTEX_ATTRIB_ARRAY_STRIDE),
+                offset: gl.getVertexAttribOffset(1, gl.VERTEX_ATTRIB_ARRAY_POINTER)
+            },
+            blend: gl.getParameter(gl.BLEND),
+            blendSrc: gl.getParameter(gl.BLEND_SRC_ALPHA),
+            blendDst: gl.getParameter(gl.BLEND_DST_ALPHA)
+        };
+
+        this.currentZone.render();
+        
+        // Restore everything
+        gl.useProgram(state.program);
+        gl.bindBuffer(gl.ARRAY_BUFFER, state.arrayBuffer);
+        gl.bindTexture(gl.TEXTURE_2D, state.texture);
+        gl.activeTexture(state.activeTexture);
+        
+        // Restore vertex attributes
+        if (state.vertexAttrib0.enabled) {
+            gl.enableVertexAttribArray(0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, state.vertexAttrib0.buffer);
+            gl.vertexAttribPointer(0, state.vertexAttrib0.size, gl.FLOAT, false, 
+                state.vertexAttrib0.stride, state.vertexAttrib0.offset);
+        } else {
+            gl.disableVertexAttribArray(0);
+        }
+        
+        if (state.vertexAttrib1.enabled) {
+            gl.enableVertexAttribArray(1);
+            gl.bindBuffer(gl.ARRAY_BUFFER, state.vertexAttrib1.buffer);
+            gl.vertexAttribPointer(1, state.vertexAttrib1.size, gl.FLOAT, false,
+                state.vertexAttrib1.stride, state.vertexAttrib1.offset);
+        } else {
+            gl.disableVertexAttribArray(1);
+        }
+        
+        if (!state.blend) gl.disable(gl.BLEND);
+        this.frameTime += performance.now() - start;
+    }
+
     endTick() {
         if (!this.started) return;
         let start = performance.now();
         updateGlitch();
         if (this.currentZone) this.currentZone.tick();
-        if (this.drednotCanvas.width !== this.lastCanvasWidth || this.drednotCanvas.height !== this.lastCanvasHeight) {
-            this.graphics.drednot_sprite.texture.destroy(false);
-            this.graphics.drednot_sprite.texture = Sprite.from(this.drednotCanvas).texture;
-            
-            this.lastCanvasWidth = this.drednotCanvas.width;
-            this.lastCanvasHeight = this.drednotCanvas.height;
-        }
-        else this.graphics.drednot_sprite.texture.source.update();
-        this.application.render();
-        this.debugDrawer.updateInterstellarFrameTime(performance.now() - start)
+        this.debugDrawer.updateInterstellarFrameTime((performance.now() - start) + this.frameTime)
     }
 
     teleport(name: string) {
         if (this.zoneOverrides[name]) {
             if (this.currentZone) this.currentZone.teleportToZone(this.zoneOverrides[name]);
-            else this.zoneOverrides[name].createZone();
+            else {
+                this.zoneOverrides[name].createZone();
+                let activeZone = this.zoneOverrides[name];
+                activeZone.subzones[activeZone.currentIndex]?.background.load();
+            }
         }
     }
 

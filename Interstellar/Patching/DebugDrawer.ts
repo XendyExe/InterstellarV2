@@ -1,4 +1,4 @@
-import { LOADED_BITMAPS } from "../Graphical/ModpackZoneBackground";
+import { LOADED_BITMAPS } from "../Graphical/WebGLZoneBackground";
 import parseColor from "../Modding/ColorParser";
 import musicPlayer from "../Music/MusicPlayer";
 import PerformanceMetrics, { stellarFormatLoadTimes } from "../PerformanceMetrics";

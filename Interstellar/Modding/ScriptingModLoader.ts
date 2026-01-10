@@ -41,9 +41,7 @@ async function getCommonJS(modid: string, path: string, mod: Modpack): Promise<s
         if (
             module.startsWith("@interstellar") ||
             module == "preact" ||
-            module == "msgpack" ||
-            module == "pixi.js" ||
-            module == "pixi-filters"
+            module == "msgpack"
         ) return `require(${quote}${module}${quote})`
         if (/^[./]+$/.test(module)) module += "/index"; // whyyyyyyy
         module += ".js"

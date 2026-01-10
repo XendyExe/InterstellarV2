@@ -3,7 +3,7 @@ import re
 import dredkit
 
 regex_contex_creation = re.compile(r"let\s+([a-zA-Z_$]+?)\s*?=\s*?([a-zA-Z_$]+?).getContext\(\"webgl\", ?({.*?})\);", re.DOTALL | re.MULTILINE)
-function_context_creation = lambda match: f"let {match[1]}=interstellar.patcher.setWebgl({match[2]}.getContext(\"webgl\", {'{' + match[3][1:-1] + ',alpha: true,premultipliedAlpha: false,preserveDrawingBuffer: true}'}));";
+function_context_creation = lambda match: f"let {match[1]}=interstellar.patcher.setWebgl({match[2]}.getContext(\"webgl2\", {'{' + match[3][1:-1] + '}'}));";
 
 def patch(path):
     with open(path + f"js/{dredkit.webgl}.js", "r", encoding="utf-8") as js_file:

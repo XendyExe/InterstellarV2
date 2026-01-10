@@ -126,10 +126,6 @@ def compile_drednot(name, path, forceObfuscate=False):
 
     print("Adding Libs")
     libs = ""
-    with open("InterstellarFoundational/libs/pixi.js", "r") as reader:
-        libs += reader.read() + "\n"
-    with open("InterstellarFoundational/libs/pixi-filters.js", "r") as reader:
-        libs += reader.read() + "\n"
 
     internal = (",".join(ordered_scripts))
     stellar_index = ordered_names.index('Interstellar')

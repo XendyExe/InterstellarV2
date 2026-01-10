@@ -1,33 +1,31 @@
-import { Filter } from "pixi.js";
-import { AdjustmentFilter, RGBSplitFilter, PixelateFilter, GlitchFilter } from "pixi-filters";
 import Interstellar from "../Interstellar";
 import StellarAssetManager from "../StellarAssetManager";
 
-let transitionFilters: Filter[] = [];
-const TransitionAdjustmentFilter = new AdjustmentFilter();
-let TransitionGlitchFilter = new GlitchFilter();
-TransitionGlitchFilter.enabled = false;
-const TransitionPixelateFilter = new PixelateFilter();
-const TransitionRGBSplitFilter = new RGBSplitFilter();
-TransitionAdjustmentFilter.saturation = 0.5;
+// let transitionFilters: Filter[] = [];
+// const TransitionAdjustmentFilter = new AdjustmentFilter();
+// let TransitionGlitchFilter = new GlitchFilter();
+// TransitionGlitchFilter.enabled = false;
+// const TransitionPixelateFilter = new PixelateFilter();
+// const TransitionRGBSplitFilter = new RGBSplitFilter();
+// TransitionAdjustmentFilter.saturation = 0.5;
 
-TransitionGlitchFilter.seed = 0.313;
-TransitionGlitchFilter.slices = 20;
-TransitionGlitchFilter.offset = 200;
+// TransitionGlitchFilter.seed = 0.313;
+// TransitionGlitchFilter.slices = 20;
+// TransitionGlitchFilter.offset = 200;
 
-// @ts-ignore idk why this is complaining, it works
-TransitionPixelateFilter.size.x = 10;
-// @ts-ignore idk why this is complaining, it works
-TransitionPixelateFilter.size.y = 10;
+// // @ts-ignore idk why this is complaining, it works
+// TransitionPixelateFilter.size.x = 10;
+// // @ts-ignore idk why this is complaining, it works
+// TransitionPixelateFilter.size.y = 10;
 
-TransitionRGBSplitFilter.red.x = 20;
-TransitionRGBSplitFilter.red.y = 20;
-TransitionRGBSplitFilter.blue.x = -20;
-TransitionRGBSplitFilter.blue.y = -20;
-transitionFilters.push(TransitionAdjustmentFilter);
-transitionFilters.push(TransitionGlitchFilter);
-transitionFilters.push(TransitionPixelateFilter);
-transitionFilters.push(TransitionRGBSplitFilter);
+// TransitionRGBSplitFilter.red.x = 20;
+// TransitionRGBSplitFilter.red.y = 20;
+// TransitionRGBSplitFilter.blue.x = -20;
+// TransitionRGBSplitFilter.blue.y = -20;
+// transitionFilters.push(TransitionAdjustmentFilter);
+// transitionFilters.push(TransitionGlitchFilter);
+// transitionFilters.push(TransitionPixelateFilter);
+// transitionFilters.push(TransitionRGBSplitFilter);
 
 const transitionSFX: HTMLAudioElement[] = [];
 let loaded = false;
@@ -49,21 +47,13 @@ export function loadTransitionSfx() {
 function glitch(time: number, callback=() => void 0) {
     if (!loaded) return;
     (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "20%";
-    TransitionGlitchFilter.enabled = true;
-    let originalFilters: any = Interstellar.graphics.game.filters;
-    if (Interstellar.graphics.game.filters == transitionFilters) {
-        originalFilters = null;
-    } else {
-        Interstellar.graphics.game.filters = transitionFilters;
-    }
+    // TransitionGlitchFilter.enabled = true;
     let audio = transitionSFX[Math.floor(Math.random()*transitionSFX.length)]!!;
     audio.volume = JSON.parse(localStorage.getItem("dredark_user_settings")!!).volume * 0.2;
     audio.play();
     setTimeout(() => {
         (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "100%";
-        // @ts-ignore
-        if (originalFilters) Interstellar.graphics.game.filters = originalFilters;
-        TransitionGlitchFilter.enabled = false;
+        // TransitionGlitchFilter.enabled = false;
         if (callback) callback();
     }, time);
 }
@@ -71,13 +61,7 @@ function glitch(time: number, callback=() => void 0) {
 export async function glitchEx(time: number, preback: () => Promise<void>, callback: () => Promise<void>) {
     if (!loaded) return;
     (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "20%";
-    TransitionGlitchFilter.enabled = true;
-    let originalFilters: any = Interstellar.graphics.game.filters;
-    if (Interstellar.graphics.game.filters == transitionFilters) {
-        originalFilters = null;
-    } else {
-        Interstellar.graphics.game.filters = transitionFilters;
-    }
+    // TransitionGlitchFilter.enabled = true;
     let audio = transitionSFX[Math.floor(Math.random()*transitionSFX.length)]!!;
     audio.volume = JSON.parse(localStorage.getItem("dredark_user_settings")!!).volume * 0.2;
     audio.play();
@@ -86,12 +70,11 @@ export async function glitchEx(time: number, preback: () => Promise<void>, callb
     let wait = time + (Date.now()-currentTime);
     if (wait > 0) await new Promise((resolve, _) => { setTimeout(resolve, wait)});
     (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "100%";
-    if (originalFilters) Interstellar.graphics.game.filters = originalFilters;
-    TransitionGlitchFilter.enabled = false;
+    // TransitionGlitchFilter.enabled = false;
     await callback();
 }
 
 export function updateGlitch() {
-    if (TransitionGlitchFilter.enabled) TransitionGlitchFilter.refresh();
+    // if (TransitionGlitchFilter.enabled) TransitionGlitchFilter.refresh();
 }
 export default glitch;

@@ -5,8 +5,7 @@
     "sprites": [
         {
             "path": "biiiig_planet.png",
-            "x": -25,
-            "y": 0,
+            "y": 20,
             "boby": 4,
             "bobt": 30,
             "bobo": 2.3
@@ -23,18 +22,20 @@
                 ],
                 "fps": 8
             },
-            "x": 5,
-            "y": -20
+            "x": 30,
+            "y": 5
         },
         {
             "path": "smal.png",
-            "x": -30,
+            "x": -10,
+            "y": 20,
             "boby": 3,
             "bobt": 10
         },
         {
             "path": "planet.png",
-            "x": -10,
+            "x": 10,
+            "y": 20,
             "boby": 2,
             "bobt": 5,
             "bobo": 1.04
@@ -47,9 +48,7 @@
                     "animation_name": "EHSBlackHole"
                 },
                 "fps": 24
-            },
-            "x": 160,
-            "y": 90
+            }
         }
     ]
 }

@@ -6,6 +6,7 @@ import StellarEventManager from "../API/StellarEventManager";
 import Interstellar from "../Interstellar";
 import { DREDNOT_ZONES } from "../StellarConstants";
 import { DebugDrawer, LoadDebugRequires } from "./DebugDrawer";
+import { gl, helper_setwebgl } from "../Graphical/WebGLHelpers";
 
 
 const joinShipServerMessage = /Joined ship '(.*?)' {([0-9A-F]+)}$/
@@ -76,9 +77,12 @@ class Patcher {
         this.resolveWaitRequires();
     }
 
-    setWebgl(gl: WebGLRenderingContext) {
-        this.webgl = gl;
-        return gl;
+    setWebgl(_gl: WebGL2RenderingContext) {
+        this.webgl = _gl;
+        helper_setwebgl(_gl)
+        // @ts-ignore
+        window.game_webgl = _gl;
+        return _gl;
     }
 
     getNavDestination() {
@@ -94,6 +98,7 @@ class Patcher {
         const gl = this.webgl!!;
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
+        Interstellar.drawBackgrounds();
     }
 
     trigger_frame_end(cl: any) {

@@ -1,8 +1,14 @@
 import Interstellar from "../Interstellar";
 
+
 const blacklisted = [
     "bg_gradient.png", "star.png"
 ]
+
+interface LoadedTextures extends Set<Blob> {
+    memory?: number;
+}
+export const LOADED_TEXTURES: LoadedTextures = new Set();
 export class Textures {
     textures: Record<string, Blob> = {}
     constructor() {
@@ -10,6 +16,7 @@ export class Textures {
     
     addTexture(path: string, blob: Blob) {
         this.textures[path] = blob;
+        LOADED_TEXTURES.add(blob);
     }
 
     switchToTexture() {

@@ -1,19 +1,19 @@
 export interface BobConfig {
     
 }
-export interface Spritesheet {
+export interface SpritesheetConfig {
     image: string;
     json: string;
     animation_name: string;
 }
-export interface AnimatedSprite {
+export interface AnimatedSpriteConfig {
     sprites?: string[];
-    spritesheet?: Spritesheet;
+    spritesheet?: SpritesheetConfig;
     fps: number;
 }
-export interface BackgroundSprite {
+export interface BackgroundSpriteConfig {
     path?: string;
-    animated?: AnimatedSprite;
+    animated?: AnimatedSpriteConfig;
     x?: number;
     y?: number;
     tile?: "x" | "y" | "xy";
@@ -31,5 +31,5 @@ export interface BackgroundConfig {
     width: number;
     height: number;
     isPixelArt?: boolean;
-    sprites: BackgroundSprite[];
+    sprites: BackgroundSpriteConfig[];
 }

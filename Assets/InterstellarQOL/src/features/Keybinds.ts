@@ -3,7 +3,6 @@ import StellarAPI from "@interstellar/StellarAPI"
 import StellarCommandsManager from "@interstellar/StellarCommandsManager"
 import StellarEventManager from "@interstellar/StellarEventManager"
 import InterstellarQOL from ".."
-import { triangulateWithHoles } from "pixi.js"
 
 export interface Keybind {
     disabled: boolean,

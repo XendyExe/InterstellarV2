@@ -54,6 +54,4 @@ export function revealInterstellarExports() {
     Interstellar.patcher.preact = scriptingModExports["preact"] = require("preact");
     // @ts-ignore
     Interstellar.patcher.msgpack = scriptingModExports["msgpack"] = require("msgpack");
-    // @ts-ignore
-    scriptingModExports["pixi.js"] = window.PIXI;
 }
