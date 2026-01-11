@@ -213,5 +213,5 @@ export async function createModpack(flattened: Record<string, BlobContainer>, in
             delete flattened[key];
         }
     }
-    return await (new Modpack(assetStoreName, internal_name)).init(getFileFunction, !!internal_name, cleanFilesFunction);
+    return await (new Modpack(assetStoreName, internal_name + "/")).init(getFileFunction, !!internal_name, cleanFilesFunction);
 }

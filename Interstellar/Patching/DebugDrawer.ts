@@ -1,7 +1,8 @@
-import { LOADED_BITMAPS } from "../Graphical/WebGLZoneBackground";
+import InterstellarWebGL from "../Graphical/InterstellarWebGL";
+import { WebGLZoneBackground } from "../Graphical/WebGLZoneBackground";
+import Interstellar from "../Interstellar";
 import parseColor from "../Modding/ColorParser";
 import musicPlayer from "../Music/MusicPlayer";
-import PerformanceMetrics, { stellarFormatLoadTimes } from "../PerformanceMetrics";
 import { formatBytes, roundTo } from "../StellarUtils";
 
 // MOST CODE EVER SHUT UP.
@@ -41,13 +42,8 @@ function format_music_samples(samples: bigint) {
 
 export class DebugDrawer {
     frameTimeTotal: number = 0;
-    interstellarFrameTime: number = 0;
     updateTotalFrameTime(t: number) {
         this.frameTimeTotal = this.frameTimeTotal * 0.99 + t * 0.01
-    }
-
-    updateInterstellarFrameTime(t: number) {
-        this.interstellarFrameTime = this.interstellarFrameTime * 0.99 + t * 0.01;
     }
 
     drawTickTime(t: string, a: any, l: number) {
@@ -65,7 +61,8 @@ export class DebugDrawer {
         let ry = 90;
         Graphics.drawTextSS("Estimated Turnaround Time: " + u + " ms", x, ry, color, 14); ry += 30;
         Graphics.drawTextSS("Frame Time: " + this.frameTimeTotal.toFixed(2) + " ms", x, ry, color, 14); ry += 25;
-        Graphics.drawTextSS("Interstellar Rendering: " + this.interstellarFrameTime.toFixed(2) + " ms (" + (((this.interstellarFrameTime/this.frameTimeTotal) * 100).toFixed(2)) + "%)", x, ry, color, 10); ry += 20;
+        const frameTimeTotal = InterstellarWebGL.frameTime.backgrounds + InterstellarWebGL.frameTime.postprocess + InterstellarWebGL.frameTime.final;
+        Graphics.drawTextSS("Interstellar Rendering: " + frameTimeTotal.toFixed(2) + " ms (" + (((frameTimeTotal/this.frameTimeTotal) * 100).toFixed(2)) + "%)", x, ry, color, 10); ry += 20;
         if (ship != null) {
             this.drawTickTime("Ship", ship, ry)
         }
@@ -129,10 +126,6 @@ export class DebugDrawer {
         let sX = 1000;
         let sY = 90;
         let canvas_memory = 0;
-        let bitmap_memory = 0;
-        for (const bitmap of LOADED_BITMAPS) {
-            bitmap_memory += bitmap.width * bitmap.height * 4;
-        }
         const canvases = document.querySelectorAll('canvas');
         canvases.forEach((canvas, i) => {
             canvas_memory += canvas.width * canvas.height * 4;
@@ -146,12 +139,27 @@ export class DebugDrawer {
         if (musicPlayer.debug_data != null) {
             music_player_mem += musicPlayer.debug_data.wasm_mem + musicPlayer.debug_data.cache_mem;
         }
+        let atlas_memory = 0;
+        for (const zone of Object.values(Interstellar.zoneOverrides)) {
+            for (const subzone of zone.subzones) {
+                const background = subzone.background;
+                if (background instanceof WebGLZoneBackground && background.loaded) {
+                    atlas_memory += background.atlasSize.width * background.atlasSize.height * background.atlasLayerCount * 4;
+                }
+            }
+        }
 
-        Graphics.drawTextSS(`Total analyzable memory: ${formatBytes(canvas_memory + bitmap_memory + canvas_memory + js_heap_allocated, )}`, sX, sY, color, 14); sY += 25;
+        Graphics.drawTextSS(`Total analyzable memory: ${formatBytes(atlas_memory + canvas_memory + canvas_memory + js_heap_allocated, )}`, sX, sY, color, 14); sY += 25;
         Graphics.drawTextSS(`JS Heap: ${formatBytes(js_heap_used)}/${formatBytes(js_heap_allocated)}`, sX, sY, color, 10); sY += 20;
         Graphics.drawTextSS(`Music: ${formatBytes(music_player_mem)}`, sX, sY, color, 10); sY += 20;
-        Graphics.drawTextSS(`Bitmaps: ${formatBytes(bitmap_memory)}`, sX, sY, color, 10); sY += 20;
         Graphics.drawTextSS(`Canvases: ${formatBytes(canvas_memory)}`, sX, sY, color, 10); sY += 20;
+        Graphics.drawTextSS(`Static Atlases (gpu): ${formatBytes(atlas_memory)}`, sX, sY, color, 10); sY += 20;
+
+        sY += 20;
+        Graphics.drawTextSS(`Interstellar Rendering`, sX, sY, color, 12); sY += 24;
+        Graphics.drawTextSS(`Background: ${InterstellarWebGL.frameTime.backgrounds.toFixed(3)}ms`, sX, sY, color, 10); sY += 20;
+        Graphics.drawTextSS(`Post Process: ${InterstellarWebGL.frameTime.postprocess.toFixed(3)}ms`, sX, sY, color, 10); sY += 20;
+        Graphics.drawTextSS(`BlitTrans: ${InterstellarWebGL.frameTime.final.toFixed(3)}ms`, sX, sY, color, 10); sY += 20;
 
 
         // let loadX = 1000;

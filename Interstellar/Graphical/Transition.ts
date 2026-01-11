@@ -1,5 +1,6 @@
 import Interstellar from "../Interstellar";
 import StellarAssetManager from "../StellarAssetManager";
+import InterstellarWebGL from "./InterstellarWebGL";
 
 // let transitionFilters: Filter[] = [];
 // const TransitionAdjustmentFilter = new AdjustmentFilter();
@@ -47,13 +48,13 @@ export function loadTransitionSfx() {
 function glitch(time: number, callback=() => void 0) {
     if (!loaded) return;
     (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "20%";
-    // TransitionGlitchFilter.enabled = true;
+    InterstellarWebGL.glitching = true;
     let audio = transitionSFX[Math.floor(Math.random()*transitionSFX.length)]!!;
     audio.volume = JSON.parse(localStorage.getItem("dredark_user_settings")!!).volume * 0.2;
     audio.play();
     setTimeout(() => {
         (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "100%";
-        // TransitionGlitchFilter.enabled = false;
+        InterstellarWebGL.glitching = false;
         if (callback) callback();
     }, time);
 }
@@ -61,7 +62,7 @@ function glitch(time: number, callback=() => void 0) {
 export async function glitchEx(time: number, preback: () => Promise<void>, callback: () => Promise<void>) {
     if (!loaded) return;
     (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "20%";
-    // TransitionGlitchFilter.enabled = true;
+    InterstellarWebGL.glitching = true;
     let audio = transitionSFX[Math.floor(Math.random()*transitionSFX.length)]!!;
     audio.volume = JSON.parse(localStorage.getItem("dredark_user_settings")!!).volume * 0.2;
     audio.play();
@@ -70,7 +71,7 @@ export async function glitchEx(time: number, preback: () => Promise<void>, callb
     let wait = time + (Date.now()-currentTime);
     if (wait > 0) await new Promise((resolve, _) => { setTimeout(resolve, wait)});
     (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "100%";
-    // TransitionGlitchFilter.enabled = false;
+    InterstellarWebGL.glitching = false;
     await callback();
 }
 

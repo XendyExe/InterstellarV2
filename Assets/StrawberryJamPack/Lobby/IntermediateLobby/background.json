@@ -7,26 +7,27 @@
             "path": "./fghills.png",
             "tile": "x",
             "px": 0.1,
-            "y": -25
+            "y": 15
         },
         {
             "path": "./mghills.png",
             "tile": "x",
             "px": 0.05,
-            "y": -25
+            "y": 40
         },
         {
             "path": "./puffycloud.png",
             "tile": "x",
             "mx": 1,
             "mt": 0.2,
-            "y": -10
+            "y": -15
         },
         {
             "path": "./the moon and the sun.png"
         },
         {
             "path": "./skybox.png",
+            "tile": "x",
             "px": -0.01
         }
     ]

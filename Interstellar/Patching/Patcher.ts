@@ -7,6 +7,7 @@ import Interstellar from "../Interstellar";
 import { DREDNOT_ZONES } from "../StellarConstants";
 import { DebugDrawer, LoadDebugRequires } from "./DebugDrawer";
 import { gl, helper_setwebgl } from "../Graphical/WebGLHelpers";
+import InterstellarWebGL from "../Graphical/InterstellarWebGL";
 
 
 const joinShipServerMessage = /Joined ship '(.*?)' {([0-9A-F]+)}$/
@@ -82,6 +83,7 @@ class Patcher {
         helper_setwebgl(_gl)
         // @ts-ignore
         window.game_webgl = _gl;
+        InterstellarWebGL.create();
         return _gl;
     }
 
@@ -98,7 +100,7 @@ class Patcher {
         const gl = this.webgl!!;
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        Interstellar.drawBackgrounds();
+        InterstellarWebGL.renderPassBackgrounds();
     }
 
     trigger_frame_end(cl: any) {
@@ -106,6 +108,7 @@ class Patcher {
         this.gameActive = cl.isGameActive();
         this.zoom = this.gameActive ? cl.local_cam_zoom : 0;
         this.navDestination = this.getNavDestination();
+        InterstellarWebGL.endFrame();
         Interstellar.endTick();
     }
 

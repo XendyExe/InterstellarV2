@@ -13,6 +13,7 @@ ship_hud = "ShipHUD"
 debug_drawer = "DebugInfoManager"
 settings = "UserSettingsUI"
 initgame = "InitGame"
+errorlogging = "ErrorLogger"
 objectmenus = "ObjectMenus"
 teammanager = "TeamManagerLogger"
 shipyard = "Shipyard"
@@ -22,7 +23,7 @@ msgpack = "msgpack"
 modfiledatabase = "ModFileDatabase"
 
 source_map = {
-    "ErrorLogger": ["reportError:"],
+    errorlogging: ["reportError:"],
     "Client": ["exports.cl_module"],
     "ReplicatedClasses": ["ReplicatedWorldManager:"],
     "SocketMsgTypes": ["MsgType:"],

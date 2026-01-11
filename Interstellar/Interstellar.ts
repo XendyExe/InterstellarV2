@@ -242,74 +242,9 @@ class Interstellar {
         console.log("Done!");
     }
 
-
-    frameTime: number = 0;
-    drawBackgrounds() {
-        this.frameTime = 0;
-        if (!this.currentZone) return;
-        let start = performance.now();
-        const state = {
-            program: gl.getParameter(gl.CURRENT_PROGRAM),
-            arrayBuffer: gl.getParameter(gl.ARRAY_BUFFER_BINDING),
-            texture: gl.getParameter(gl.TEXTURE_BINDING_2D),
-            activeTexture: gl.getParameter(gl.ACTIVE_TEXTURE),
-            // Save vertex attribute state
-            vertexAttrib0: {
-                enabled: gl.getVertexAttrib(0, gl.VERTEX_ATTRIB_ARRAY_ENABLED),
-                buffer: gl.getVertexAttrib(0, gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING),
-                size: gl.getVertexAttrib(0, gl.VERTEX_ATTRIB_ARRAY_SIZE),
-                stride: gl.getVertexAttrib(0, gl.VERTEX_ATTRIB_ARRAY_STRIDE),
-                offset: gl.getVertexAttribOffset(0, gl.VERTEX_ATTRIB_ARRAY_POINTER)
-            },
-            vertexAttrib1: {
-                enabled: gl.getVertexAttrib(1, gl.VERTEX_ATTRIB_ARRAY_ENABLED),
-                buffer: gl.getVertexAttrib(1, gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING),
-                size: gl.getVertexAttrib(1, gl.VERTEX_ATTRIB_ARRAY_SIZE),
-                stride: gl.getVertexAttrib(1, gl.VERTEX_ATTRIB_ARRAY_STRIDE),
-                offset: gl.getVertexAttribOffset(1, gl.VERTEX_ATTRIB_ARRAY_POINTER)
-            },
-            blend: gl.getParameter(gl.BLEND),
-            blendSrc: gl.getParameter(gl.BLEND_SRC_ALPHA),
-            blendDst: gl.getParameter(gl.BLEND_DST_ALPHA)
-        };
-
-        this.currentZone.render();
-        
-        // Restore everything
-        gl.useProgram(state.program);
-        gl.bindBuffer(gl.ARRAY_BUFFER, state.arrayBuffer);
-        gl.bindTexture(gl.TEXTURE_2D, state.texture);
-        gl.activeTexture(state.activeTexture);
-        
-        // Restore vertex attributes
-        if (state.vertexAttrib0.enabled) {
-            gl.enableVertexAttribArray(0);
-            gl.bindBuffer(gl.ARRAY_BUFFER, state.vertexAttrib0.buffer);
-            gl.vertexAttribPointer(0, state.vertexAttrib0.size, gl.FLOAT, false, 
-                state.vertexAttrib0.stride, state.vertexAttrib0.offset);
-        } else {
-            gl.disableVertexAttribArray(0);
-        }
-        
-        if (state.vertexAttrib1.enabled) {
-            gl.enableVertexAttribArray(1);
-            gl.bindBuffer(gl.ARRAY_BUFFER, state.vertexAttrib1.buffer);
-            gl.vertexAttribPointer(1, state.vertexAttrib1.size, gl.FLOAT, false,
-                state.vertexAttrib1.stride, state.vertexAttrib1.offset);
-        } else {
-            gl.disableVertexAttribArray(1);
-        }
-        
-        if (!state.blend) gl.disable(gl.BLEND);
-        this.frameTime += performance.now() - start;
-    }
-
     endTick() {
         if (!this.started) return;
-        let start = performance.now();
-        updateGlitch();
         if (this.currentZone) this.currentZone.tick();
-        this.debugDrawer.updateInterstellarFrameTime((performance.now() - start) + this.frameTime)
     }
 
     teleport(name: string) {

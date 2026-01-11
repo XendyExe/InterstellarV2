@@ -1,4 +1,4 @@
-from patcher import patch_html, patch_modfiledatabase
+from patcher import patch_html, patch_modfiledatabase, patch_errorlogger
 from patcher import patch_css
 from patcher import patch_texts
 from patcher import patch_webgl
@@ -24,3 +24,4 @@ def patchall(path, game_version):
     patch_uievents.patch(path)
     patch_htmluifunctions.patch(path)
     patch_modfiledatabase.patch(path)
+    patch_errorlogger.patch(path)
