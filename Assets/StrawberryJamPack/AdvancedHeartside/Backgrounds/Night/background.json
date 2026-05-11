@@ -1,0 +1,42 @@
+{
+    "width": 320,
+    "height": 180,
+    "fillColor": "#9949a1",
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./foreground.png",
+            "tile": "x",
+            "px": 0.1,
+            "py": 0.1,
+            "pz": 0.02
+        },
+        {
+            "path": "./dunes.png",
+            "tile": "x",
+            "px": 0.05,
+            "py": 0.05,
+            "pz": 0.1
+        },
+        {
+            "path": "./mountain.png",
+            "tile": "x",
+            "px": 0,
+            "pz": 0.06
+        },
+        {
+            "path": "./clouds.png",
+            "tile": "x",
+            "mx": 1,
+            "mt": 0.25,
+            "pz": 0.05
+        },
+        {
+            "path": "./background.png",
+            "tile": "x",
+            "mx": 1,
+            "mt": 0.5,
+            "pz": 0.01
+        }
+    ]
+}

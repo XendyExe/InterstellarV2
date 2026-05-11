@@ -1,0 +1,26 @@
+{
+    "name": "Blueberry Bay Heartside",
+    "description": "Lawful - Beginner Heartside [Hummingbird]",
+    "color": "#3e86dd",
+    "music": "./BlueberryBayHeartsideLoop.ogg",
+    "music_start": 0.622,
+    "subzones": [
+        {
+            "background": "./Background/background.json"
+        }
+    ],
+    "textures": {
+        "tiles_overworld.png": "~/Shared/BlueberryBay/tiles_overworld.png"
+    },
+    "filters": {
+        "AdvancedBloomFilter": {
+            "threshold": 0.9,
+            "blur": 20,
+            "quality": 10,
+            "bloomScale": 0.1
+        },
+        "AdjustmentFilter": {
+            "gamma": 1.05
+        }
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "name": "Clockwork",
+    "description": "Mission - Buried Treasure [The Pits]",
+    "color": "#1d101f",
+    "music": "./ClockworkLoop.ogg",
+    "subzones": [
+        {
+            "background": "./Background/background.json"
+        }
+    ],
+    "textures": {
+        "tiles_overworld.png": "./Textures/tiles_overworld.png",
+        "ball.png": "./Textures/ball.png",
+        "loot_sign.png": "./Textures/loot_sign.png"
+    }
+}

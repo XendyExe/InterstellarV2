@@ -1,0 +1,30 @@
+{
+    "width": 320,
+    "height": 180,
+    "fillColor": "#7f8c94",
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./midclouds.png",
+            "tile": "x",
+            "mx": 1,
+            "mt": 0.5,
+            "pz": 0.5
+        },
+        {
+            "path": "./bigclouds.png",
+            "pz": 0.3
+        },
+        {
+            "path": "./bgclouds.png",
+            "tile": "x",
+            "mx": 1,
+            "mt": 0.75,
+            "pz": 0.1
+        },
+        {
+            "path": "./bg.png",
+            "pz": 0.05
+        }
+    ]
+}

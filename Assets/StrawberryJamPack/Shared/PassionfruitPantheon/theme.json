@@ -1,0 +1,13 @@
+{
+    "--dark-bg": "#392a2ae5",
+    "--recent-chat-bg": "#392a2aef",
+    "--dark-links": "#fff2a1",
+    "--btn-color": "linear-gradient(#976f70,#976f70 200%)",
+    "--btn-blue-color": "linear-gradient(#ffd386,#b08788 200%)",
+    "--btn-blue-text-color": "black",
+    "--btn-yellow-color": "linear-gradient(#ffffd0,#fede97 200%)",
+    "--btn-yellow-text-color": "black",
+    "--btn-red-color": "linear-gradient(#cd000a, #9b0004 200%)",
+    "--btn-green-color": "linear-gradient(#a8c9dd,#bab2e6 200%)",
+    "--btn-green-text-color": "black"
+}

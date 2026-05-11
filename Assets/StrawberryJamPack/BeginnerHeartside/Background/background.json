@@ -1,0 +1,32 @@
+{
+    "width": 320,
+    "height": 180,
+    "fillColor": "#3e85dd",
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./foreground.png",
+            "tile": "x",
+            "px": 0.1,
+            "pz": 1
+        },
+        {
+            "path": "./sand.png",
+            "tile": "x",
+            "px": 0.05,
+            "pz": 0.4
+        },
+        {
+            "path": "./far.png",
+            "tile": "x",
+            "px": 0.025,
+            "pz": 0.2
+        },
+        {
+            "path": "./farther.png",
+            "tile": "x",
+            "px": 0.0125,
+            "pz": 0.1
+        }
+    ]
+}

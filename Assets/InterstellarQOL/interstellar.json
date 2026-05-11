@@ -1,0 +1,8 @@
+{
+    "name": "Interstellar QOL",
+    "id": "interstellar.qol",
+    "creator": "Xendy",
+    "description": "Xendy's QOL pack",
+    "scripting": "commonjs",
+    "entrypoint": "./dist/index.js"
+}

@@ -1,0 +1,33 @@
+.dark {
+    background: #392a2a !important; 
+}
+#chat.closed #chat-content p.recent {
+    background: #392a2aef !important; 
+}
+.dark a, .darker a {
+    color: #fff2a1 !important; 
+}
+
+button, .btn {
+    background: linear-gradient(#976f70,#976f70 200%);
+}
+
+.btn-blue {
+    background: linear-gradient(#ffd386,#b08788 200%) !important;
+    color: black !important;
+}
+
+.btn-yellow {
+    background: linear-gradient(#ffffd0,#fede97 200%) !important;
+    color: black !important;
+}
+
+.btn-red {
+    background: linear-gradient(#cd000a, #9b0004 200%) !important;
+}
+.btn-green {
+    background: linear-gradient(#a8c9dd,#bab2e6 200%) !important;
+}
+.btn-small .btn-green{
+    background: linear-gradient(#a8c9dd,#bab2e6 200%) !important;
+}

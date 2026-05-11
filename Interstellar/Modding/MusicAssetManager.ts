@@ -1,0 +1,1 @@
+export const MUSIC_TYPES = ["ogg", "mp3", "wav", "opu", "webm"]

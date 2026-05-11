@@ -1,0 +1,78 @@
+{
+    "width": 320,
+    "height": 180,
+    "fillColor": "69385a",
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "biiiig_planet.png",
+            "y": 20,
+            "boby": 4,
+            "bobt": 30,
+            "bobo": 2.3,
+            "pz": 1
+        },
+        {
+            "path": "planet.png",
+            "x": 0,
+            "y": 20,
+            "boby": 2,
+            "bobt": 5,
+            "bobo": 1.04,
+            "pz": 0.3
+        },
+        {
+            "path": "smal.png",
+            "x": -30,
+            "y": 20,
+            "boby": 3,
+            "bobt": 10,
+            "pz": 0.15
+        },
+        {
+            "animated": {
+                "sprites": [
+                    "star8fps00.png",
+                    "star8fps01.png",
+                    "star8fps02.png",
+                    "star8fps03.png",
+                    "star8fps04.png",
+                    "star8fps05.png"
+                ],
+                "fps": 8
+            },
+            "x": 30,
+            "y": 5,
+            "pz": 0.1
+        },
+        {
+            "path": "ldm_bg.png",
+            "x": 0,
+            "y": 0,
+            "pz": 0.05,
+            "low_detail": true
+        }
+    ],
+    "backdrops": [
+        {
+            "type": "cloudscape",
+            "alpha": 1,
+            "x": -38,
+            "pz": 0.05,
+            "innerRotation": -0.3,
+            "outerRotation": 0.06,
+            "outerRadius": 190,
+            "ringCount": 550,
+            "bgColor": "#012391",
+            "gradientColors": [
+                "#ffffff",
+                "#ffffff",
+                "#319573",
+                "#e6bd73",
+                "#c68556",
+                "#7A3D59",
+                "#6D3652"
+            ]
+        }
+    ]
+}

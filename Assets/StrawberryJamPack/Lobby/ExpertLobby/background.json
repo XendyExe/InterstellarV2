@@ -1,0 +1,11 @@
+{
+    "width": 320,
+    "height": 180,
+    "isPixelArt": true,
+    "fillColor": "#3f0854",
+    "sprites": [
+        {
+            "path": "./background.png"
+        }
+    ]
+}

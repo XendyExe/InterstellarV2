@@ -1,0 +1,13 @@
+{
+    "name": "Paint",
+    "description": "Mission - Dig for Treasure [Canary]",
+    "music": "./PaintLoop.ogg",
+    "color": "#333333",
+    "music_start": 24.567,
+    "subzones": [{
+        "background": "./Background/background.json"
+    }],
+    "textures": {
+        "tiles_overworld.png": "./Textures/tiles_overworld.png"
+    }
+}

@@ -1,0 +1,47 @@
+{
+    "name": "Starfruit Supernova Heartside",
+    "description": "Anarchic - Expert Heartside [Raven]",
+    "color": "#ff87eb",
+    "music": "./StarfruitSupernovaHeartsideLoop.ogg",
+    "music_start": 10.236,
+    "filters": {
+        "AdvancedBloomFilter": {
+            "threshold": 0.8,
+            "blur": 5,
+            "quality": 10,
+            "bloomScale": 0.1
+        },
+        "AdjustmentFilter": {
+            "gamma": 1.1
+        }
+    },
+    "subzones": [
+        {
+            "background": "./Background/background.json",
+            "theme": "~/Shared/StarfruitSupernova/theme.json",
+            "postprocess": [
+                {
+                    "type": "lut",
+                    "layer": "all",
+                    "path": "./lut.png"
+                },
+                {
+                    "type": "lut",
+                    "layer": "game",
+                    "path": "./midlut.png"
+                },
+                {
+                    "type": "bloom",
+                    "layer": "all",
+                    "threshold": 0.85,
+                    "blurriness": 2,
+                    "blurPasses": 5,
+                    "opacity": 0.1
+                }
+            ]
+        }
+    ],
+    "textures": {
+        "tiles_overworld.png": "~/Shared/StarfruitSupernova/tiles_overworld.png"
+    }
+}

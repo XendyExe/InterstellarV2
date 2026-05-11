@@ -1,0 +1,40 @@
+			FONDA STYLEGROUND INFO
+(from bottom to top)
+(unless specified alpha is 1.0)
+(unless specified X and Y are 0)
+
+- Stylegrounds
+	fonda_background
+Scroll X- 0.07
+Scroll Y- 0
+
+	fonda_clouds2
+Scroll X- 0.11
+Scroll Y- 0.01
+			
+	fonda_Tower
+Scroll X- 0.13
+Scroll Y- 0.011
+
+	fonda_BeegGear
+Scroll X- 0.15
+Scroll Y- 0.012
+
+	fonda_BeegGear2
+Scroll X- 0.18
+Scroll Y- 0.013
+Y- (-15)
+
+	fonda_SmolGear
+Scroll X- 0.2
+Scroll Y- 0.015
+
+	fonda_clouds
+Scroll X- 0.3
+Scroll Y- 0.02
+Y- (10)
+
+- Effects
+	Max480s Custom Color Blackhole
+Alpha- 0.2
+Colors- default, or you can customise them

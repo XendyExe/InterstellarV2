@@ -1,0 +1,48 @@
+{
+    "name": "Passionfruit Pantheon",
+    "description": "Anarchic - Advanced Heartside [Falcon]",
+    "color": "#fde9a8",
+    "cycle_style": [0, 0, 1, 2, 3, 3, 2, 1],
+    "cycle_time": 60,
+    "smooth_transition": true,
+    "music": "./PassionfruitPantheonHeartsideLoop.ogg",
+    "music_start": 11.234,
+    "filters": {
+        "AdvancedBloomFilter": {
+            "threshold": 0.8,
+            "blur": 10,
+            "quality": 20,
+            "bloomScale": 0.15
+        }
+    },
+    "subzones": [
+        {
+            "background": "./Backgrounds/Day/background.json",
+            "theme": "~/Shared/PassionfruitPantheon/theme.json",
+            "textures": {
+                "tiles_overworld.png": "~/Shared/PassionfruitPantheon/Day/tiles_overworld.png"
+            }
+        },
+        {
+            "background": "./Backgrounds/Transition/background.json",
+            "theme": "~/Shared/PassionfruitPantheon/theme.json",
+            "textures": {
+                "tiles_overworld.png": "~/Shared/PassionfruitPantheon/Noon/tiles_overworld.png"
+            }
+        },
+        {
+            "background": "./Backgrounds/Night/background.json",
+            "theme": "~/Shared/PassionfruitPantheon/theme.json",
+            "textures": {
+                "tiles_overworld.png": "~/Shared/PassionfruitPantheon/Night/tiles_overworld.png"
+            }
+        },
+        {
+            "background": "./Backgrounds/Midnight/background.json",
+            "theme": "~/Shared/PassionfruitPantheon/theme.json",
+            "textures": {
+                "tiles_overworld.png": "~/Shared/PassionfruitPantheon/Midnight/tiles_overworld.png"
+            }
+        }
+    ]
+}

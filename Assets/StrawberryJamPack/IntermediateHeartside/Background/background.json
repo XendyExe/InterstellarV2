@@ -1,0 +1,55 @@
+{
+    "width": 320,
+    "height": 180,
+    "fillColor": "#81889c",
+    "isPixelArt": true,
+    "sprites": [
+        {
+            "path": "./fgtrees.png",
+            "tile": "x",
+            "y": 40,
+            "px": 0.1,
+            "pz": 1
+        },
+        {
+            "path": "./mghills.png",
+            "tile": "x",
+            "y": 30,
+            "px": 0.05,
+            "pz": 0.3
+        },
+        {
+            "path": "./bghills.png",
+            "tile": "x",
+            "y": 20,
+            "px": 0.025,
+            "pz": 0.12
+        },
+        {
+            "path": "./sunglare1.png",
+            "pz": 0.06
+        },
+        {
+            "path": "./sun.png",
+            "pz": 0.06
+        }
+    ],
+    "backdrops": [
+        {
+            "type": "cloudscape",
+            "alpha": 1,
+            "x": 90,
+            "y": 60,
+            "pz": 0.05,
+            "innerRotation": 0.1,
+            "outerRotation": 0.2,
+            "outerRadius": 320,
+            "ringCount": 100,
+            "bgColor": "#5a6074",
+            "gradientColors": [
+                "#b2bbcf",
+                "#5a6074"
+            ]
+        }
+    ]
+}

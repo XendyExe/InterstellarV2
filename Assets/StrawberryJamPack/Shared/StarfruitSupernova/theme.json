@@ -1,0 +1,10 @@
+{
+    "--dark-bg": "#361747e5",
+    "--recent-chat-bg": "#361747ef",
+    "--dark-links": "#eeacbe",
+    "--btn-color": "linear-gradient(#8d3aa2,#6e2e96 200%)",
+    "--btn-blue-color": "linear-gradient(#b57453,#78215d 200%)",
+    "--btn-yellow-color": "linear-gradient(#8d3aa2,#6e2e96 200%)",
+    "--btn-red-color": "linear-gradient(#d90f60, #4e0011 200%)",
+    "--btn-green-color": "linear-gradient(#3aa291,#2e967f 200%)"
+}

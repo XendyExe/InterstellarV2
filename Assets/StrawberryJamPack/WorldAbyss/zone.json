@@ -1,0 +1,13 @@
+{
+    "name": "World Abyss",
+    "description": "void",
+    "music": "./WorldAbyssLoop.ogg",
+    "color": "#333333",
+    "music_start": 0.803,
+    "subzones": [{
+        "background": "./Background/background.json"
+    }],
+    "textures": {
+        "tiles_overworld.png": "./Textures/tiles_overworld.png"
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "name": "Starfruit Supernova Simulator",
+    "description": "Ships restored on exit.",
+    "color": "#ff87eb",
+    "music": "./StarfruitSupernovaHeartsideLoop.ogg",
+    "music_start": 10.236,
+    "filters": {
+        "AdvancedBloomFilter": {
+            "threshold": 0.8,
+            "blur": 5,
+            "quality": 10,
+            "bloomScale": 0.1
+        },
+        "AdjustmentFilter": {
+            "gamma": 1.1
+        }
+    },
+    "subzones": [
+        {
+            "background": "./Background/background.json",
+            "theme": "~/Shared/StarfruitSupernova/theme.json"
+        }
+    ],
+    "textures": {
+        "tiles_overworld.png": "~/Shared/StarfruitSupernova/tiles_overworld.png"
+    }
+}
