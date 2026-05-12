@@ -138,6 +138,23 @@ function_modify_assets = lambda match: f"""{match[1]}.{match[2]}("button", {'{'}
         ),
         {match[1]}.{match[2]}("p", null, "This hides the interstellar badges. May require reload."),
         {match[1]}.{match[2]}("br", null),
+        
+                {match[1]}.{match[2]}("p", null, 
+            {match[1]}.{match[2]}("b", null, "Disable transition glitches"), 
+            {match[1]}.{match[2]}("input", {"{"}
+                    type: "checkbox", 
+                    checked: this.state.I_disableGlitchEffect, 
+                    onInput: e => {"{"}
+                        if (!((e != null && e.target instanceof HTMLInputElement))) return;
+                        this.setState({'{'}I_disableGlitchEffect: e.target.checked{'}'});
+                        interstellar.settingsManager.settings.disableGlitchEffect = e.target.checked;
+                        interstellar.settingsManager.update();
+                    {"}"}
+                {"}"}
+            ),
+        ),
+        {match[1]}.{match[2]}("p", null, "Disables the glitch effect."),
+        {match[1]}.{match[2]}("br", null),
 """
 
 def patch(path):

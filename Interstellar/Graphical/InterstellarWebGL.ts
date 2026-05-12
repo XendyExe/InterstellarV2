@@ -227,7 +227,7 @@ export class InterstellarWebGL {
         const gamebuffer = this.getFramebuffer(BUFF_STAGE.GAME_BUFFER);
             
         gl.bindFramebuffer(gl.FRAMEBUFFER, gamebuffer.fbo);
-        if (this.glitching) gamebuffer!!.renderTo(null, this.glitchProcessor)
+        if (this.glitching && !Interstellar.settingsManager.settings.disableGlitchEffect) gamebuffer!!.renderTo(null, this.glitchProcessor)
         else gamebuffer!!.renderTo(null, this.copyProcess);
         gl.useProgram(this.program);
         this.frameTime.final = this.frameTime.final * 0.99 + (performance.now() - start) * 0.01;

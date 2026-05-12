@@ -5,7 +5,8 @@ interface InterstellarSettingTypes {
     disableComplexGFX: boolean,
     disableTelemetry: boolean,
     disableInterstellarBadge: boolean,
-    disableCycleZones: boolean
+    disableCycleZones: boolean,
+    disableGlitchEffect: boolean
 }
 
 const defaultSettings: InterstellarSettingTypes = {
@@ -15,7 +16,8 @@ const defaultSettings: InterstellarSettingTypes = {
     disableComplexGFX: false,
     disableTelemetry: false,
     disableInterstellarBadge: false,
-    disableCycleZones: false
+    disableCycleZones: false,
+    disableGlitchEffect: false,
 }
 
 export class InterstellarSettings {
@@ -34,6 +36,7 @@ export class InterstellarSettings {
         state.I_disableTelemetry = this.settings.disableTelemetry;
         state.I_disableInterstellarBadge = this.settings.disableInterstellarBadge;
         state.I_disableCycleZones = this.settings.disableCycleZones;
+        state.I_disableGlitchEffect = this.settings.disableGlitchEffect;
     }
 
     update() {
