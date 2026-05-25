@@ -24,7 +24,7 @@ class DefaultGravity {
         if (this.defaultGravs[event.hex]) {
             let dir = this.defaultGravs[event.hex];
             __1.default.logMessage(`Set ship default gravity: ${grav[dir]}`);
-            StellarAPI_1.default.sendPacket({ type: StellarAPI_1.default.Packet.ClMsgTeamAct, arg: dir, act: "gravity" });
+            StellarAPI_1.default.sendPacket({ type: StellarAPI_1.default.Packet.ClMsgTeamAct, arg: dir, act: "gravity" }, true);
         }
     }
     onRenderShipSettings(event) {

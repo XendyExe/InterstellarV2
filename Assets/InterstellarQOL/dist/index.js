@@ -34,6 +34,8 @@ const ModConfiguration_1 = require("@interstellar/ModConfiguration");
 const Autoresponse_1 = __importDefault(require("./features/Autoresponse"));
 const ShipTags_1 = __importDefault(require("./features/ShipTags"));
 const OnlineList_1 = __importDefault(require("./features/OnlineList"));
+const Chat_1 = __importDefault(require("./features/Chat"));
+const DisableGravity_1 = __importDefault(require("./features/DisableGravity"));
 class InterstellarQOL extends InterstellarScriptingMod_1.default {
     constructor() {
         super(...arguments);
@@ -54,6 +56,8 @@ class InterstellarQOL extends InterstellarScriptingMod_1.default {
         // speedrun = new PitsSpeedrun();
         this.onlineList = new OnlineList_1.default();
         // pingstablizer = new Pingtablizer();
+        this.chat = Chat_1.default;
+        this.nograv = new DisableGravity_1.default();
         this.options = {
             sillyAutoresponse: new ModConfiguration_1.BooleanModSetting("Silly Autoresponse", "Enable silly autorespones. Silly autoresponses has a cooldown of 60 seconds.", true),
             // translateLanguage: new InputModSetting("Translate to", "What language to translate to? Please enter language codes, like en for english, ru for russian, etc. See https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes", "en");

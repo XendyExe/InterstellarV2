@@ -14,6 +14,9 @@ function_motdSet = lambda match: f".innerHTML = interstellar.patcher.processMOTD
 regex_chatSet = re.compile(r"if ?\(([a-zA-Z0-9_$]+)\) ?\{.*?if ?\(([a-zA-Z0-9_$]+)\.value ?!= ?\"\" ?&& ?([a-zA-Z0-9_$]+)\.time\.perf_now ?- ?([a-zA-Z0-9_$]+) ?< ?([103e]+)\) ?{.*?return.*?}", re.MULTILINE | re.DOTALL)
 function_chatSet =  lambda match: f"""if ({match[1]}) {"{"}
 """
+
+regex_writeChatFunctionSet = re.compile(r"writeChat: ?\(\) ?=> ?([a-zA-Z0-9_$]+)", re.MULTILINE)
+function_writeChatFunctionSet = lambda match: f"writeChat: () => (e) => {"{"}if (interstellar.patcher.onWriteChat(e)) return; return {match[1]}(e);{"}"}"
 def patch(path):
     with open(base_dir / path / f"js/{dredkit.htmluifunctions}.js", "r", encoding="utf-8") as js_file:
         js = js_file.read()
@@ -24,6 +27,8 @@ def patch(path):
     closeChatVariable = re.search(r"closeChat: ?\(\) ?=> ?([a-zA-Z_$]+),", js, re.MULTILINE).group(1)
     js = re.sub(fr"function {closeChatVariable}\(\) ?" + "{", lambda match: f"function {closeChatVariable}()" + "{interstellar.patcher.onChatClose();", js, re.MULTILINE)
     js = regex_motdSet.sub(function_motdSet, js)
+
+    js = regex_writeChatFunctionSet.sub(function_writeChatFunctionSet, js)
     with open(base_dir / path / f"js/{dredkit.htmluifunctions}.js", "w", encoding="utf-8") as js_file:
         js_file.write(dredkit.prettify_js(js))
 

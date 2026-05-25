@@ -4,6 +4,7 @@ import { CurrentShipData, PlayerListEntry } from "./Utils";
 import StellarCommandsManager from "./StellarCommandsManager";
 import Patcher from "../Patching/Patcher";
 import parseColor from "../Modding/ColorParser";
+import {SocketMessageSendEvent} from "./InterstellarEvents";
 
 class InterstellarUIAPI {
     settingModels: Record<string, VNode> = {};
@@ -393,8 +394,15 @@ class StellarAPI {
         Patcher.sendChatCallback(text, no_events);
     }
 
-    sendPacket(packet: any) {
-        this.websocket?.send(Interstellar.patcher.msgpack.encode(packet));
+    sendPacket(packet: any, bypassEvent: boolean = false) {
+        if (bypassEvent) {
+            return this.websocket?.send(Interstellar.patcher.msgpack.encode(packet));
+        }
+        let event = new SocketMessageSendEvent(packet);
+        event.dispatch();
+        if (!event.isCanceled()) {
+            this.websocket?.send(Interstellar.patcher.msgpack.encode(packet));
+        }
     }
 
     isCaptain() {

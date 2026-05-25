@@ -22,7 +22,7 @@ class DefaultGravity {
         if (this.defaultGravs[event.hex]) {
             let dir = this.defaultGravs[event.hex]!!;
             InterstellarQOL.logMessage(`Set ship default gravity: ${grav[dir]}`)
-            StellarAPI.sendPacket({type: StellarAPI.Packet.ClMsgTeamAct, arg: dir, act: "gravity"})
+            StellarAPI.sendPacket({type: StellarAPI.Packet.ClMsgTeamAct, arg: dir, act: "gravity"}, true)
         }
     }
 

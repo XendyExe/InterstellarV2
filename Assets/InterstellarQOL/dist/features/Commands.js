@@ -90,6 +90,7 @@ class PrivateCommand extends StellarCommandsManager_1.BaseCommand {
         this.alias = [];
         this.testOnly = false;
         this.arguments = [];
+        this.requireCaptain = true;
     }
     execute() {
         __1.default.logMessage("Set ship to private!");
@@ -106,6 +107,7 @@ class PublicCommand extends StellarCommandsManager_1.BaseCommand {
         this.name = "public";
         this.alias = [];
         this.testOnly = false;
+        this.requireCaptain = true;
         this.arguments = [];
     }
     execute() {
@@ -254,6 +256,21 @@ class ChangeFireModeCommand extends StellarCommandsManager_1.BaseCommand {
         }
     }
 }
+class ShipSize extends StellarCommandsManager_1.BaseCommand {
+    constructor() {
+        super(...arguments);
+        this.name = "getsize";
+        this.alias = [];
+        this.testOnly = false;
+        this.arguments = [];
+    }
+    execute() {
+        let ship = StellarAPI_1.default.Game.getLocalShipState();
+        if (ship === undefined)
+            return __1.default.logMessage("Not currently in a ship!");
+        __1.default.logMessage(`Your ship's size is ${ship.block_w}x${ship.block_h} blocks, or ${Math.floor((ship.block_w - 2) / 0.3) / 10}x${Math.floor((ship.block_h - 2) / 0.3) / 10} rcs`);
+    }
+}
 function registerCommands() {
     StellarCommandsManager_1.default.registerCommand(new GravityCommand());
     StellarCommandsManager_1.default.registerCommand(new LeaveCommand());
@@ -268,4 +285,5 @@ function registerCommands() {
     StellarCommandsManager_1.default.registerCommand(new CrewCommand());
     StellarCommandsManager_1.default.registerCommand(new CapCommand());
     StellarCommandsManager_1.default.registerCommand(new ChangeFireModeCommand());
+    StellarCommandsManager_1.default.registerCommand(new ShipSize());
 }

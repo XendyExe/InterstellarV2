@@ -46,6 +46,7 @@ class PrivateCommand extends BaseCommand {
     alias = []
     testOnly = false;
     arguments = [];
+    requireCaptain = true;
     execute() {
         InterstellarQOL.logMessage("Set ship to private!")
         StellarAPI.sendPacket({
@@ -60,6 +61,7 @@ class PublicCommand extends BaseCommand {
     name = "public"
     alias = []
     testOnly = false;
+    requireCaptain = true;
     arguments = [];
     execute() {
         InterstellarQOL.logMessage("Set ship to public!")
@@ -193,6 +195,18 @@ class ChangeFireModeCommand extends BaseCommand {
     }
 }
 
+class ShipSize extends BaseCommand {
+    name = "getsize"
+    alias = []
+    testOnly = false;
+    arguments = [];
+    execute() {
+        let ship = StellarAPI.Game.getLocalShipState();
+        if (ship === undefined) return InterstellarQOL.logMessage("Not currently in a ship!");
+        InterstellarQOL.logMessage(`Your ship's size is ${ship.block_w}x${ship.block_h} blocks, or ${Math.floor((ship.block_w - 2)/0.3)/10}x${Math.floor((ship.block_h - 2)/0.3)/10} rcs`);
+    }
+}
+
 export function registerCommands() {
     StellarCommandManager.registerCommand(new GravityCommand());
     StellarCommandManager.registerCommand(new LeaveCommand());
@@ -207,4 +221,5 @@ export function registerCommands() {
     StellarCommandManager.registerCommand(new CrewCommand());
     StellarCommandManager.registerCommand(new CapCommand());
     StellarCommandManager.registerCommand(new ChangeFireModeCommand());
+    StellarCommandManager.registerCommand(new ShipSize());
 }

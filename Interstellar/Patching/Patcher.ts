@@ -1,5 +1,25 @@
 import { get_internals, give_world_manager } from "@InterstellarInternals";
-import { AdvertClickEvent, ChatCloseEvent, ChatMessageRecieveEvent, ChatMessageSendEvent, CrewListUpdateEvent, FilterShipEvent, JoinShipEvent, JoinShipRequestEvent, ProcessAdvertsEvent, ProcessMOTDEvent, RenderAdvertsEvent, RenderPassOneEvent, RenderPassThreeEvent, RenderPassTwoEvent, SocketCloseEvent, SocketMessageRecieveEvent, SocketOpenEvent, TriggerEvent } from "../API/InterstellarEvents";
+import {
+    AdvertClickEvent,
+    ChatCloseEvent,
+    ChatMessageRecieveEvent,
+    ChatMessageSendEvent,
+    CrewListUpdateEvent,
+    FilterShipEvent,
+    JoinShipEvent,
+    JoinShipRequestEvent,
+    ProcessAdvertsEvent,
+    ProcessMOTDEvent,
+    RenderAdvertsEvent,
+    RenderPassOneEvent,
+    RenderPassThreeEvent,
+    RenderPassTwoEvent,
+    SocketCloseEvent,
+    SocketMessageRecieveEvent, SocketMessageSendEvent,
+    SocketOpenEvent,
+    TriggerEvent,
+    WriteChatEvent
+} from "../API/InterstellarEvents";
 import StellarAPI from "../API/StellarAPI";
 import StellarCommandsManager from "../API/StellarCommandsManager";
 import StellarEventManager from "../API/StellarEventManager";
@@ -38,7 +58,7 @@ class Patcher {
     textformatter: any;
     graphics: any;
     // @ts-ignore
-    usersettingsmanager: any = require("UserSettingManager");;
+    usersettingsmanager: any = require("UserSettingManager");
     gameActive = false;
     enableGriefMessages = true;
     sendChatCallback: any;
@@ -202,6 +222,12 @@ class Patcher {
     chatQueue: any[] = [];
     lastChatTime = 0;
     handleMessageSend(message: any) {
+        let event = new SocketMessageSendEvent(message);
+        event.dispatch();
+        if (event.isCanceled()) {
+            return null;
+        }
+
         // @ts-ignore
         if (message.type == StellarAPI.Packet.ClMsgChat) {
             if (this.chatQueue.length > 0 || Date.now() - this.lastChatTime < 1000) {
@@ -400,6 +426,12 @@ class Patcher {
         let event = new FilterShipEvent(props);
         event.dispatch();
         return event.removed;
+    }
+
+    onWriteChat(element: string) {
+        let event = new WriteChatEvent(element);
+        event.dispatch();
+        return event.isCanceled();
     }
     
 }

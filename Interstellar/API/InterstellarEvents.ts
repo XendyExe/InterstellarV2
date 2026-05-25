@@ -173,6 +173,14 @@ export class RenderSmallShipEntryEvent extends UIEvent {}
 export class RenderShiplistSidebarEvent extends UIEvent {}
 export class RenderShiplistAdSlotEvent extends UIEvent {}
 
+export class WriteChatEvent extends CancelableEvent {
+    html: string;
+    constructor(html: string) {
+        super();
+        this.html = html;
+    }
+}
+
 export class ProcessMOTDEvent extends BaseEvent {
     motd: string;
     constructor(d: string) {
@@ -254,5 +262,6 @@ export function createEventExports() {
     exports.RenderPassOneEvent = RenderPassOneEvent;
     exports.RenderPassTwoEvent = RenderPassTwoEvent;
     exports.RenderPassThreeEvent = RenderPassThreeEvent;
+    exports.WriteChatEvent = WriteChatEvent;
     return exports;
 }

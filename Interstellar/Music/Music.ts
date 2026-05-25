@@ -12,6 +12,8 @@ export class Music {
     assetStore: string;
     path: string;
     start_time: number;
+
+    playing: boolean = false;
     constructor(path: string, hash: string, startTime: number) {
         this.hash = hash;
         let split = path.split("/");
@@ -57,7 +59,11 @@ export class Music {
     }
 
     async play () {
+        this.playing = true;
         await musicPlayer.loadedPromise;
+        if (!this.playing) {
+            return;
+        }
         await this.load();
     }
 
@@ -66,6 +72,7 @@ export class Music {
     }
 
     deactivate() {
-        musicPlayer.node!!.port.postMessage({type: "music_disable", hash: (new TextEncoder()).encode(this.hash)});
+        this.playing = false;
+        musicPlayer.node?.port.postMessage({type: "music_disable", hash: (new TextEncoder()).encode(this.hash)});
     }
 }

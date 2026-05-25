@@ -1,9 +1,10 @@
 import { RenderSettingsEvent } from "@interstellar/InterstellarEvents";
 import StellarAPI from "@interstellar/StellarAPI";
-import { h, Fragment, Component, Attributes, ComponentChildren, Ref } from "preact";
+import { Fragment, Component, Attributes, ComponentChildren, Ref, h } from "preact";
 import Autoequip, { EquipmentSlot } from "./features/Autoequip";
 import Keybinds, { Keybind } from "./features/Keybinds";
 import ToggleableBillboards from "./features/ToggleableBillboards";
+import Chat from "./features/Chat";
 
 let shouldReload = false;
 class KeybindsComponent extends Component {
@@ -127,6 +128,10 @@ StellarAPI.DrednotSettings.setEnableGriefingWarning(enableGrief);
 ToggleableBillboards.enabled = enableNestBillboards;
 export function settingsEventListener(event: RenderSettingsEvent) {
     enableGrief = (localStorage.getItem("isqol-enableGriefWarnings") ?? "true") == "true";
+    Chat.autotranslate = localStorage.getItem("isqol-autotrans") === "true";
+    Chat.translatecode = localStorage.getItem("isqol-translatecode") ?? "en";
+    console.log(Chat.autotranslate);
+
     StellarAPI.UI.preactAppendChild(event.gameplaySettings, 
         <>
             <button onClick={() => {
@@ -151,5 +156,91 @@ export function settingsEventListener(event: RenderSettingsEvent) {
             localStorage.setItem("isqol-enableNestBillboards", enable ? "true" : "false")
             ToggleableBillboards.enabled = enable;
         }} checked={enableNestBillboards}/></label></p>
+    </>)
+    console.log(event.displaySettings);
+    let children = StellarAPI.UI.preactNormalizeChildren(event.displaySettings);
+    console.log(children);
+    // @ts-ignore
+    StellarAPI.UI.preactInsertAfter(event.displaySettings, event.displaySettings.props.children[0]!!, <>
+        <p><b>Translate chat to:</b> <select name="language"
+                                             value={Chat.translatecode}
+                                             onChange={(e) => {
+                                                 Chat.translatecode = (e.target as HTMLSelectElement).value;
+                                                 localStorage.setItem("isqol-translatecode", (e.target as HTMLSelectElement).value)
+                                                 Chat.swapTranslateCode();
+                                             }}>
+            {/** Common / High-use languages */}
+            <option value="en">English</option>
+            <option value="ru">Русский</option>
+            <option value="es">Español</option>
+            <option value="zh-CN">中文（简体）</option>
+            <option value="zh-TW">中文（繁體）</option>
+            <option value="hi">हिन्दी</option>
+            <option value="ar">العربية</option>
+            <option value="pt">Português</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="ja">日本語</option>
+            <option value="ko">한국어</option>
+            <option value="it">Italiano</option>
+            <option value="tr">Türkçe</option>
+            <option value="vi">Tiếng Việt</option>
+
+            {/** Other widely used languages */}
+            <option value="nl">Nederlands</option>
+            <option value="pl">Polski</option>
+            <option value="uk">Українська</option>
+            <option value="el">Ελληνικά</option>
+            <option value="sv">Svenska</option>
+            <option value="fi">Suomi</option>
+            <option value="da">Dansk</option>
+            <option value="no">Norsk</option>
+            <option value="cs">Čeština</option>
+            <option value="ro">Română</option>
+            <option value="hu">Magyar</option>
+            <option value="id">Bahasa Indonesia</option>
+            <option value="ms">Bahasa Melayu</option>
+            <option value="th">ไทย</option>
+            <option value="he">עברית</option>
+            <option value="fa">فارسی</option>
+            <option value="bn">বাংলা</option>
+            <option value="ur">اردو</option>
+
+            {/** South Asian languages */}
+            <option value="ta">தமிழ்</option>
+            <option value="te">తెలుగు</option>
+            <option value="ml">മലയാളം</option>
+            <option value="kn">ಕನ್ನಡ</option>
+            <option value="gu">ગુજરાતી</option>
+            <option value="mr">मराठी</option>
+            <option value="pa">ਪੰਜਾਬੀ</option>
+
+            {/** Southeast / East European */}
+            <option value="bg">Български</option>
+            <option value="hr">Hrvatski</option>
+            <option value="sr">Српски</option>
+            <option value="sk">Slovenčina</option>
+            <option value="sl">Slovenščina</option>
+            <option value="lt">Lietuvių</option>
+            <option value="lv">Latviešu</option>
+            <option value="et">Eesti</option>
+            <option value="sq">Shqip</option>
+            <option value="mk">Македонски</option>
+
+            {/** African languages (commonly supported in Google Translate) */}
+            <option value="af">Afrikaans</option>
+            <option value="sw">Kiswahili</option>
+
+            {/** Other */}
+            <option value="is">Íslenska</option>
+            <option value="tl">Filipino</option>
+
+        </select></p>
+
+        <p><label><b>Autotranslate: </b><input type="checkbox" onChange={(e) => {
+            const enable = (e.target as HTMLInputElement).checked;
+            Chat.autotranslate = enable;
+            localStorage.setItem("isqol-autotrans", enable ? "true" : "false")
+        }} checked={Chat.autotranslate}/></label></p>
     </>)
 }

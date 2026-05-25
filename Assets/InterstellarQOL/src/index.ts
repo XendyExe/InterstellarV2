@@ -22,6 +22,8 @@ import Autoresponse from "./features/Autoresponse";
 import ShipTags from "./features/ShipTags";
 import PitsSpeedrun from "./features/PitsSpeedrun";
 import OnlineList from "./features/OnlineList";
+import Chat from "./features/Chat";
+import DisableGravity from "./features/DisableGravity";
 
 export default class InterstellarQOL extends InterstellarScriptingMod {
     rejoinButton = new RejoinButton();
@@ -41,6 +43,8 @@ export default class InterstellarQOL extends InterstellarScriptingMod {
     // speedrun = new PitsSpeedrun();
     onlineList = new OnlineList();
     // pingstablizer = new Pingtablizer();
+    chat = Chat;
+    nograv = new DisableGravity();
 
     options = {
         sillyAutoresponse: new BooleanModSetting("Silly Autoresponse", "Enable silly autorespones. Silly autoresponses has a cooldown of 60 seconds.", true),

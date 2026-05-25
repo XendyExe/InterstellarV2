@@ -8,6 +8,7 @@
     "esModuleInterop": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
+    "baseUrl": ".",
     "paths": {
       "@interstellar/InterstellarScriptingMod": ["../../cache/tscompile/API/InterstellarScriptingMod"],
       "@interstellar/StellarAPI": ["../../cache/tscompile/API/StellarAPI"],
