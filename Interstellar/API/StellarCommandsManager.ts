@@ -13,11 +13,13 @@ export abstract class Argument<T> {
 
 export class OptionsArgument extends Argument<string> {
     options: string[];
-    hidden: string[]
-    constructor(name: string, options: string[], hidden: string[] = []) {
+    hidden: string[];
+    greedy: boolean = false;
+    constructor(name: string, options: string[], hidden: string[] = [], greedy: boolean = false) {
         super(name);
         this.options = options;
         this.hidden = hidden;
+        this.greedy = greedy;
     }
 
     autocomplete(split: string): string[] {
@@ -65,17 +67,17 @@ export class StringArgument extends Argument<string> {
         return split;
     }
 }
-
+let playerArgumentDebounce = 0;
 export class PlayerArgument extends Argument<string> {
     greedy = true;
     autocomplete(split: string): string[] {
-        if (!StellarAPI.Game.sentCrewControlRequest) {
+        if (Date.now() - playerArgumentDebounce > 100) {
             StellarAPI.sendPacket({
                 type: StellarAPI.Packet.ClMsgTeamAct,
                 act: "player_list",
                 arg: null
             });
-            StellarAPI.Game.sentCrewControlRequest = true;
+            playerArgumentDebounce = Date.now();
         }
         const result = [...StellarAPI.Game.cachedPlayers].filter(name => name.toLowerCase().startsWith(split.toLowerCase()));
         return result.length == 0 ? ["$<possibly offline player...>"] : result; 

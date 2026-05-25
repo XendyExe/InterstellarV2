@@ -139,6 +139,9 @@ class Chat {
             .blocked-container {
                 background-color: #00000088;
             }
+            #chat.closed #chat-content p.recent {
+                overflow: auto;
+            }
         `;
         document.head.appendChild(style);
         this.translateAll.innerHTML = "Translate All";
@@ -147,7 +150,8 @@ class Chat {
                 this.translateAll.innerHTML = "Translate All";
                 this.autotranslate = false;
                 localStorage.setItem("isqol-autotrans", this.autotranslate ? "true" : "false");
-                for (let message of this.chat) {
+                for (let i = this.chat.length - 1; i >= 0; i--) {
+                    let message = this.chat[i];
                     if (message.showingTranslated) {
                         message.showingTranslated = false;
                         message.chatContent.style.display = "";
@@ -159,7 +163,8 @@ class Chat {
                 this.translateAll.innerHTML = "Untranslate All";
                 this.autotranslate = true;
                 localStorage.setItem("isqol-autotrans", this.autotranslate ? "true" : "false");
-                for (let message of this.chat) {
+                for (let i = this.chat.length - 1; i >= 0; i--) {
+                    let message = this.chat[i];
                     if (!message.showingTranslated) {
                         this.translateEntry(message);
                         message.showingTranslated = true;
@@ -282,9 +287,7 @@ class Chat {
             entry.showingTranslated = true;
             this.translateEntry(entry);
         }
-        if (this._chatContent.scrollHeight - this._chatContent.clientHeight <= this._chatContent.scrollTop) {
-            this._chatContent.scrollTop = this._chatContent.scrollHeight - this._chatContent.clientHeight;
-        }
+        const wasAtBottom = this._chatContent.scrollHeight - this._chatContent.clientHeight <= this._chatContent.scrollTop + 1;
         this.chat.push(entry);
         if (messageContainer.childNodes.length == 2) {
             let user = null;
@@ -303,6 +306,9 @@ class Chat {
         this.lastBlockContainer = null;
         this.makeRecent(entry);
         this._chatContent.appendChild(chatElement);
+        if (wasAtBottom) {
+            this._chatContent.scrollTop = this._chatContent.scrollHeight - this._chatContent.clientHeight;
+        }
     }
     incrementMessageCount(entry) {
         entry.count += 1;
@@ -536,7 +542,7 @@ class UnmuteCommand extends StellarCommandsManager_1.BaseCommand {
                 deleteProperty() {
                     throw new Error("This list is read-only");
                 }
-            }))];
+            }), [], true)];
     }
     execute(player) {
         let blocked = Chat.getBlockedList();
