@@ -197,14 +197,15 @@ class Chat {
         }
     }
     onFocus() {
-        for (let entry of this.tabbedOut) {
+        const entries = [...this.tabbedOut];
+        this.tabbedOut.length = 0;
+        for (let entry of entries) {
             entry.element.classList.remove("recent");
             this.makeRecent(entry);
             setTimeout(() => {
                 entry.element.style.backgroundColor = "";
             }, 20000);
         }
-        this.tabbedOut.length = 0;
     }
     onDrednotWriteChat(event) {
         event.cancelEvent();
@@ -245,9 +246,6 @@ class Chat {
         btn1.innerHTML = GOOGLE_TRANSLATE;
         actions.appendChild(btn1);
         chatElement.appendChild(actions);
-        chatElement.appendChild(messageContainer);
-        chatElement.appendChild(translateContainer);
-        chatElement.appendChild(countContainer);
         countContainer.classList.add("isqol-chat-count");
         chatElement.appendChild(messageContainer);
         chatElement.appendChild(translateContainer);
@@ -317,8 +315,12 @@ class Chat {
         if (entry.recentTimeout != 0)
             clearTimeout(entry.recentTimeout);
         if (entry.blockContainer === null) {
+            const wasAtBottom = this._chatContent.scrollHeight - this._chatContent.clientHeight <= this._chatContent.scrollTop + 1;
             this.makeRecent(entry);
             this._chatContent.appendChild(entry.element);
+            if (wasAtBottom) {
+                this._chatContent.scrollTop = this._chatContent.scrollHeight - this._chatContent.clientHeight;
+            }
         }
     }
     makeRecent(entry) {
@@ -510,6 +512,7 @@ class MuteCommand extends StellarCommandsManager_1.BaseCommand {
         player = player.toLowerCase().trim();
         if (player == "" || player.length < 3 || player.length > 20) {
             index_1.default.logMessage(`Invalid player to mute: "${player}"`);
+            return;
         }
         let blocked = Chat.getBlockedList();
         blocked.push(player);
