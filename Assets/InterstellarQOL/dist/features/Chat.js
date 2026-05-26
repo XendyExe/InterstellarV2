@@ -141,6 +141,11 @@ class Chat {
             }
             #chat.closed #chat-content p.recent {
                 overflow: auto;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            #chat.closed #chat-content p.recent::-webkit-scrollbar {
+              display: none;
             }
         `;
         document.head.appendChild(style);
@@ -201,7 +206,7 @@ class Chat {
         this.tabbedOut.length = 0;
         for (let entry of entries) {
             entry.element.classList.remove("recent");
-            this.makeRecent(entry);
+            this.makeRecent(entry, true);
             setTimeout(() => {
                 entry.element.style.backgroundColor = "";
             }, 20000);
@@ -323,8 +328,8 @@ class Chat {
             }
         }
     }
-    makeRecent(entry) {
-        if (document.visibilityState == "hidden") {
+    makeRecent(entry, forceFocus = false) {
+        if (document.visibilityState == "hidden" && !forceFocus) {
             entry.element.classList.add("recent");
             entry.element.style.backgroundColor = "#4d1616";
             this.tabbedOut.push(entry);
