@@ -101,6 +101,8 @@ class Chat {
                 opacity: 0;
                 pointer-events: none;
                 transition: opacity 0.15s ease;
+                
+                overflow: hidden;
             }
             
             .chat-message:hover .chat-actions {
@@ -332,7 +334,9 @@ class Chat {
         if (document.visibilityState == "hidden" && !forceFocus) {
             entry.element.classList.add("recent");
             entry.element.style.backgroundColor = "#4d1616";
-            this.tabbedOut.push(entry);
+            if (!this.tabbedOut.includes(entry)) {
+                this.tabbedOut.push(entry);
+            }
         }
         else {
             entry.element.classList.add("recent");
