@@ -117,7 +117,6 @@ class Chat {
             }
             
             .chat-message {
-                position: relative;
                 display: block;
             }
             
@@ -182,7 +181,7 @@ class Chat {
             }
         };
         document.querySelector("#chat-send").after(this.translateAll);
-        window.addEventListener("focus", this.onFocus.bind(this));
+        document.addEventListener("visibilitychange", this.onFocus.bind(this));
     }
     onPacket(event) {
         if (event.message.type == StellarAPI_1.default.Packet.SvMsgChat) {
@@ -204,6 +203,8 @@ class Chat {
         }
     }
     onFocus() {
+        if (document.visibilityState === "hidden")
+            return;
         const entries = [...this.tabbedOut];
         this.tabbedOut.length = 0;
         for (let entry of entries) {

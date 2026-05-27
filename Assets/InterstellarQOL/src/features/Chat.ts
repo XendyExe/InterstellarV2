@@ -89,7 +89,6 @@ class Chat {
             }
             
             .chat-message {
-                position: relative;
                 display: block;
             }
             
@@ -156,7 +155,7 @@ class Chat {
         }
         document.querySelector("#chat-send")!!.after(this.translateAll);
 
-        window.addEventListener("focus", this.onFocus.bind(this));
+        document.addEventListener("visibilitychange", this.onFocus.bind(this));
     }
 
     onPacket(event: SocketMessageRecieveEvent) {
@@ -180,6 +179,7 @@ class Chat {
     }
 
     onFocus() {
+        if (document.visibilityState === "hidden") return;
         const entries = [...this.tabbedOut];
         this.tabbedOut.length = 0;
         for (let entry of entries) {
