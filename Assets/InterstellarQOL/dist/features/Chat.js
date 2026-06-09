@@ -118,6 +118,7 @@ class Chat {
             
             .chat-message {
                 display: block;
+                position: relative;
             }
             
             .isqol-trans-icon {
@@ -140,13 +141,16 @@ class Chat {
             .blocked-container {
                 background-color: #00000088;
             }
-            #chat.closed #chat-content p.recent {
+            #chat.closed #chat-content p.recent,
+            #chat.closed #chat-content p.recent * {
                 overflow: auto;
                 scrollbar-width: none;
                 -ms-overflow-style: none;
             }
-            #chat.closed #chat-content p.recent::-webkit-scrollbar {
-              display: none;
+            
+            #chat.closed #chat-content p.recent::-webkit-scrollbar,
+            #chat.closed #chat-content p.recent *::-webkit-scrollbar {
+                display: none;
             }
         `;
         document.head.appendChild(style);

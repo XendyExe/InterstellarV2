@@ -24,6 +24,7 @@ import PitsSpeedrun from "./features/PitsSpeedrun";
 import OnlineList from "./features/OnlineList";
 import Chat from "./features/Chat";
 import DisableGravity from "./features/DisableGravity";
+import StellarCommandsManager, { BaseCommand } from "@interstellar/StellarCommandsManager";
 
 export default class InterstellarQOL extends InterstellarScriptingMod {
     rejoinButton = new RejoinButton();

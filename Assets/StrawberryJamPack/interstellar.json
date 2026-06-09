@@ -4,6 +4,7 @@
     "creator": "Xendy, SJ Collab Team, DMR Team",
     "icon": "icon.jpg",
     "description": "A variety of modded Celeste backgrounds and textures. See https://gamebanana.com/mods/424541. Also contains Darkmoon Ruins, see https://gamebanana.com/mods/393245",
+    "collapse_tiers": "true",
     "zones": {
         "Freeport": "./Lobby/zone.json",
 

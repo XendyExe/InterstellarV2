@@ -18,6 +18,12 @@ import LUTProcessor, { LUTProcessorConfig } from "../Graphical/PostProcessing/LU
 import BloomProcessor, { BloomProcessorConfig } from "../Graphical/PostProcessing/BloomProcessor";
 import ComplexPostProcessor from "../Graphical/PostProcessing/ComplexPostProcessor";
 
+const TIERED_ZONES = ["Finch", "Sparrow"];
+const ZONE_TIERS: Record<string, string[]> = {
+    "Finch": ["I", "II", "III"],
+    "Sparrow": ["I", "II", "III"],
+}
+
 export class Modpack {
     // @ts-ignore
     config: ModpackConfig;
@@ -240,7 +246,15 @@ export class Modpack {
             createdZone.displayColor = defaultZoneColor;
             createdZone.useSmoothTransition = config.smooth_transition ?? false;
             if (nonvalidation) {
-                Interstellar.zoneOverrides[zoneOverride] = createdZone;
+                if (this.config.collapse_tiers && TIERED_ZONES.includes(zoneOverride)) {
+                    let tiers = ZONE_TIERS[zoneOverride]!!;
+                    for (let tier of tiers) {
+                        Interstellar.zoneOverrides[zoneOverride + " " + tier] = createdZone;
+                    }
+                    Interstellar.zoneOverrides[zoneOverride] = createdZone;
+                } else {
+                    Interstellar.zoneOverrides[zoneOverride] = createdZone;
+                }
                 if (this.config.menu) {
                     Interstellar.menuZones = this.config.menu;
                 }

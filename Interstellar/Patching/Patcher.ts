@@ -246,7 +246,10 @@ class Patcher {
         e.dispatch();
 
         const menuZone = Interstellar.menuZones[StellarAPI.getSelectedServer()] ?? Interstellar.menuZones[0];
-        if (menuZone) Interstellar.currentZone!!.teleportToZone(Interstellar.zoneOverrides[menuZone]!!);
+        if (menuZone) {
+            Interstellar.currentZone!!.teleportToZone(Interstellar.zoneOverrides[menuZone]!!);
+            Interstellar.canonicalZone = menuZone;
+        }
     }
 
     
@@ -257,7 +260,6 @@ class Patcher {
     }
 
     socketopen(websocket: WebSocket) {
-        
         Interstellar.ingame = true;
         const e = new SocketOpenEvent(websocket);
         StellarAPI.websocket = websocket;
@@ -287,6 +289,8 @@ class Patcher {
 
 
     patchNavNames(zone: number) {
+        // todo this is like unsafe and everything but also like i dont care
+        // @ts-ignore
         const index = DREDNOT_ZONES[zone];
         if (index) {
             if (Interstellar.zoneOverrides[index]) return Interstellar.zoneOverrides[index].displayName;

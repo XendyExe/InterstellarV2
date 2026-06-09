@@ -32,6 +32,7 @@ export default class Zone {
     currentMusic: any | null = null;
     currentIndex: number = 0;
     transitionTarget: number = 0;
+    collapse_tiers: boolean = false;
     constructor(subzones: SubZone[], currentIndex = 0) {
         this.subzones = subzones;
         this.currentIndex = currentIndex;
@@ -93,10 +94,11 @@ export default class Zone {
                     if (this.useSmoothTransition) {
                         if (background.alpha < 1) background.alpha += 0.02;
                         if (background.alpha > 0.5 && this.transitionTarget != this.currentIndex) {
-                            if (this.subzones[this.currentIndex]!!.music) this.subzones[this.currentIndex]!!.music!!.deactivate();
+                            let change_music = this.subzones[this.currentIndex]!!.music != this.subzones[this.transitionTarget]!!.music;
+                            if (change_music && this.subzones[this.currentIndex]!!.music) this.subzones[this.currentIndex]!!.music!!.deactivate();
                             this.currentIndex = this.transitionTarget;
                             this.subzones[this.currentIndex]?.background.load();
-                            if (this.subzones[this.currentIndex]!!.music) this.subzones[this.currentIndex]!!.music!!.activate();
+                            if (change_music && this.subzones[this.currentIndex]!!.music) this.subzones[this.currentIndex]!!.music!!.activate();
                             this.subzones[this.currentIndex]?.textures.switchToTexture();
                             InterstellarWebGL.allProcessors = subzone.allProcessors;
                             InterstellarWebGL.gameProcessors = subzone.gameProcessors;

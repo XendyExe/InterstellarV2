@@ -215,6 +215,7 @@ class StellarCommandsManager {
         this.registeredCommands.push(new DrednotCommand("skew", [], true, [], true));
         this.registeredCommands.push(new DrednotCommand("noclip", [], true, [], true));
         this.registeredCommands.push(new DrednotCommand("home", [], true, [], true));
+        this.registeredCommands.push(new DrednotCommand("tier", [], true, [new OptionsArgument("option", ["up", "down", "0", "1", "2", "3", "4", "5"])], true));
 
         this.registeredCommands.forEach(element => {
             this.allCommands[element.name] = element;
