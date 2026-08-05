@@ -11,8 +11,8 @@
 
 const DEV_SERVER_PROD = "http://127.0.0.1:9000/prod/index.html";
 const DEV_SERVER_TEST = "http://127.0.0.1:9000/test/index.html";
-const PRODUCTION_URL = "https://interstellarassets.xendyexe.workers.dev/prod.game";
-const TEST_URL = "https://interstellarassets.xendyexe.workers.dev/test.game";
+const PRODUCTION_URL = "https://interstellar.fomx.dev/prod.game";
+const TEST_URL = "https://interstellar.fomx.dev/test.game";
 (async function () {
     const match = window.location.pathname.match(/\/?invite\/([a-zA-Z_0-9-]*)/);
     const loadVanilla = localStorage.getItem("interstellarLoadVanilla") === "true";
