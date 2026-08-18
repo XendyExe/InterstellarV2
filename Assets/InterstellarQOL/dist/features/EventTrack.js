@@ -64,6 +64,7 @@ function EventTrackServer(props) {
 }
 function EventTrackComponent(props) {
     const getTrackerTable = () => {
+        return [false, (0, preact_1.h)("p", null, "Telemetry is currently down. Check discord for information.")];
         if (StellarAPI_1.default.Telemetry.isDisabled()) {
             return [false, (0, preact_1.h)("p", null, "Interstellar telemetry is disabled. Cannot get event track data.")];
         }

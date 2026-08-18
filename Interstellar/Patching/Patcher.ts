@@ -361,7 +361,13 @@ class Patcher {
         let zone = Interstellar.currentZone;
         if (!zone) return;
         let subzone = zone.subzones[zone.currentIndex]!!;
-        graphics.graphics.drawTextSS(subzone.name, x, 65, subzone.color);
+        let zoneName = subzone.name;
+        if (zone.collapse_tiers) {
+            if (name.endsWith(" I")) zoneName += " I"
+            else if (name.endsWith(" II")) zoneName += " II"
+            else if (name.endsWith(" III")) zoneName += " III"
+        }
+        graphics.graphics.drawTextSS(zoneName, x, 65, subzone.color);
         graphics.graphics.drawTextSS(subzone.description, x, 85, subzone.color)
     }
 

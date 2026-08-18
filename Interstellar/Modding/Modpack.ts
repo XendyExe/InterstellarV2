@@ -252,6 +252,7 @@ export class Modpack {
                         Interstellar.zoneOverrides[zoneOverride + " " + tier] = createdZone;
                     }
                     Interstellar.zoneOverrides[zoneOverride] = createdZone;
+                    createdZone.collapse_tiers = true;
                 } else {
                     Interstellar.zoneOverrides[zoneOverride] = createdZone;
                 }
