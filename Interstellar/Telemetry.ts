@@ -59,8 +59,6 @@ export default class Telemetry {
     constructor() {
     }
     connect() {
-        // todo, reenable
-        return;
         if (Interstellar.settingsManager.settings.disableTelemetry) return;
         this.url = Interstellar.dev ? INTERSTELLAR_DEV_URL : INTERSTELLAR_PROD_URL
         if (this.websocket != null && !(this.websocket.readyState == this.websocket.CLOSED || this.websocket.readyState == this.websocket.CLOSING)) return;
