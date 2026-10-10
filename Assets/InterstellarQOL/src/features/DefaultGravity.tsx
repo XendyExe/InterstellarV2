@@ -46,6 +46,7 @@ class DefaultGravity {
             </p>
         </section>)
     }
+    
     save() {
         localStorage.setItem("isqol-defaultGravity", JSON.stringify(this.defaultGravs))
     }

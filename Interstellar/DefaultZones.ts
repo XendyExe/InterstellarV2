@@ -59,8 +59,12 @@ export function createDefaultZones() {
     new DefaultZone("Super Special Event Zone", "the abyss calls for you ...", 16777215, "#000000");
 
     new DefaultZone("Hummingbird", "Low-Risk Lawful", 4521796, "#188a83");
-    new DefaultZone("Finch", "Medium-Risk Lawful", 16777028, "#609da0");
-    new DefaultZone("Sparrow", "High-Risk Lawful", 16746564, "#485b8e");
+    new DefaultZone("Finch I", "Medium-Risk Lawful", 16777028, "#609da0");
+    new DefaultZone("Finch II", "Medium-Risk Lawful", 16777028, "#609da0");
+    new DefaultZone("Finch III", "Medium-Risk Lawful", 16777028, "#609da0");
+    new DefaultZone("Sparrow I", "High-Risk Lawful", 16746564, "#485b8e");
+    new DefaultZone("Sparrow II", "High-Risk Lawful", 16746564, "#485b8e");
+    new DefaultZone("Sparrow III", "High-Risk Lawful", 16746564, "#485b8e");
 
     new DefaultZone("Raven", "High-Risk Anarchic", 16729156, "#6a486b");
     new DefaultZone("Falcon", "Very High-Risk Anarchic", 16729156, "#330405");

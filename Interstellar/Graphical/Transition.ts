@@ -43,9 +43,13 @@ function glitch(time: number, callback=() => void 0) {
     if (!loaded) return;
     (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "20%";
     InterstellarWebGL.glitching = true;
-    let audio = transitionSFX[Math.floor(Math.random()*transitionSFX.length)]!!;
-    audio.volume = JSON.parse(localStorage.getItem("dredark_user_settings")!!).volume * 0.2;
-    audio.play();
+
+    if (!Interstellar.settingsManager.settings.disableGlitchEffect) {
+        let audio = transitionSFX[Math.floor(Math.random()*transitionSFX.length)]!!;
+        audio.volume = JSON.parse(localStorage.getItem("dredark_user_settings")!!).volume * 0.2;
+        audio.play();
+    }
+
     setTimeout(() => {
         (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "100%";
         InterstellarWebGL.glitching = false;
@@ -57,9 +61,13 @@ export async function glitchEx(time: number, preback: () => Promise<void>, callb
     if (!loaded) return;
     (document.querySelector("#big-ui-container")!! as HTMLDivElement).style.opacity = "20%";
     InterstellarWebGL.glitching = true;
-    let audio = transitionSFX[Math.floor(Math.random()*transitionSFX.length)]!!;
-    audio.volume = JSON.parse(localStorage.getItem("dredark_user_settings")!!).volume * 0.2;
-    audio.play();
+
+    if (!Interstellar.settingsManager.settings.disableGlitchEffect) {
+        let audio = transitionSFX[Math.floor(Math.random()*transitionSFX.length)]!!;
+        audio.volume = JSON.parse(localStorage.getItem("dredark_user_settings")!!).volume * 0.2;
+        audio.play();
+    }
+
     let currentTime = Date.now();
     await preback();
     let wait = time + (Date.now()-currentTime);
