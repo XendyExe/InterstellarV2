@@ -19,18 +19,6 @@ export class IndividualModAPI {
         StellarAPI.UI.registerSettingsModel("interstellar-settings-" + this.modid, <ModConfiguration modId="test" options={Object.values(options)} modname={this.modname}/>)
         settingsModels.push({name: `${this.modname} settings`, model_name: "interstellar-settings-" + this.modid})
     }
-
-    requestTelemetry(): any {
-        if (Interstellar.telemetry.isDisabled()) return null;
-        const telemetry =  {
-            onOpen: ()=>{},
-            onMessage: (msg: any)=>{},
-            onError: (err: any)=>{},
-            onClose: ()=>{}
-        }
-        this.telemetry = telemetry;
-        return telemetry;
-    }
 }
 
 export default class InterstellarScriptingMod {

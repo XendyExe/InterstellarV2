@@ -256,7 +256,7 @@ class Interstellar {
         }
         
         this.assetManager.closeDatabase();
-        this.telemetry.connect();
+        this.telemetry.do_telemetry();
     }
     
     startTick() {

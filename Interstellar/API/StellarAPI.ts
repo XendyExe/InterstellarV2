@@ -365,19 +365,11 @@ export class InterstellarDrednotSettingsAPI {
     }
 }
 
-class InterstellarTelemetryAPI {
-    getEventSchema() { return Interstellar.telemetry.eventSchema; }
-    getEventState() { return Interstellar.telemetry.eventState; }
-    isDisabled() { return Interstellar.telemetry.isDisabled(); }
-    connected() { return Interstellar.telemetry.connected; }
-}
-
 class StellarAPI {
     websocket: WebSocket | undefined;
     UI: InterstellarUIAPI = new InterstellarUIAPI();
     Input: InterstellarInputAPI = new InterstellarInputAPI();
     Game: InterstellarGameAPI = new InterstellarGameAPI();
-    Telemetry: InterstellarTelemetryAPI = new InterstellarTelemetryAPI();
     Interstellar = Interstellar
     // @ts-ignore
     DrednotSettings: InterstellarDrednotSettingsAPI;
