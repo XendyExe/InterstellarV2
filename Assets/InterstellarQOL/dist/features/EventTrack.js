@@ -24,73 +24,82 @@ function isEventState(value) {
         typeof state.time === "number" &&
         Number.isFinite(state.time));
 }
-function useEventTrack() {
-    const [events, setEvents] = (0, hooks_1.useState)({});
-    const [status, setStatus] = (0, hooks_1.useState)("connecting");
-    (0, hooks_1.useEffect)(() => {
-        let stopped = false;
-        let socket;
-        let retryTimer;
-        let hasConnected = false;
-        let retryDelay = 1000;
-        function connect() {
-            if (stopped)
+// This connection belongs to the mod, independently of the settings panel.
+let events = {};
+let status = "connecting";
+let socket;
+let retryTimer;
+let hasConnected = false;
+let retryDelay = 1000;
+const listeners = new Set();
+function notifyListeners() {
+    for (const listener of listeners)
+        listener();
+}
+function startEventTrack() {
+    if (socket || retryTimer !== undefined)
+        return;
+    status = hasConnected ? "reconnecting" : "connecting";
+    notifyListeners();
+    const connection = new WebSocket(WS_URL);
+    socket = connection;
+    connection.onmessage = ({ data }) => {
+        if (socket !== connection)
+            return;
+        try {
+            const message = JSON.parse(data);
+            if (!message || typeof message !== "object" || Array.isArray(message))
                 return;
-            setStatus(hasConnected ? "reconnecting" : "connecting");
-            const connection = new WebSocket(WS_URL);
-            socket = connection;
-            connection.onmessage = ({ data }) => {
-                if (stopped || socket !== connection)
-                    return;
-                try {
-                    const message = JSON.parse(data);
-                    if (!message || typeof message !== "object")
+            const record = message;
+            if (typeof record.name === "string" && isEventState(record)) {
+                events = Object.assign(Object.assign({}, events), { [record.name]: { event: record.event, time: record.time } });
+            }
+            else {
+                const snapshot = {};
+                for (const [name, state] of Object.entries(record)) {
+                    if (!isEventState(state))
                         return;
-                    const record = message;
-                    if (typeof record.name === "string" && isEventState(record)) {
-                        // Live update: { name, event, time, three_min }
-                        const name = record.name;
-                        const state = {
-                            event: record.event,
-                            time: record.time,
-                        };
-                        setEvents(previous => (Object.assign(Object.assign({}, previous), { [name]: state })));
-                    }
-                    else {
-                        // Initial snapshot: { trackerName: { event, time }, ... }
-                        const snapshot = {};
-                        for (const [name, state] of Object.entries(record)) {
-                            if (!isEventState(state))
-                                return;
-                            snapshot[name] = state;
-                        }
-                        setEvents(snapshot);
-                    }
-                    hasConnected = true;
-                    retryDelay = 1000;
-                    setStatus("connected");
+                    snapshot[name] = state;
                 }
-                catch (error) {
-                    console.warn("Invalid event tracker message:", error);
-                }
-            };
-            connection.onerror = () => connection.close();
-            connection.onclose = () => {
-                if (stopped || socket !== connection)
-                    return;
-                setStatus(hasConnected ? "reconnecting" : "connecting");
-                retryTimer = setTimeout(connect, retryDelay);
-                retryDelay = Math.min(retryDelay * 2, 30000);
-            };
+                events = snapshot;
+            }
+            hasConnected = true;
+            retryDelay = 1000;
+            status = "connected";
+            notifyListeners();
         }
-        connect();
-        return () => {
-            stopped = true;
-            clearTimeout(retryTimer);
-            socket === null || socket === void 0 ? void 0 : socket.close();
-        };
+        catch (error) {
+            console.warn("Invalid event tracker message:", error);
+        }
+    };
+    connection.onerror = () => {
+        if (socket === connection)
+            connection.close();
+    };
+    connection.onclose = () => {
+        if (socket !== connection)
+            return;
+        socket = undefined;
+        status = hasConnected ? "reconnecting" : "connecting";
+        notifyListeners();
+        retryTimer = setTimeout(() => {
+            retryTimer = undefined;
+            startEventTrack();
+        }, retryDelay);
+        retryDelay = Math.min(retryDelay * 2, 30000);
+    };
+}
+function useEventTrack() {
+    const [state, setState] = (0, hooks_1.useState)(() => ({ events, status }));
+    (0, hooks_1.useEffect)(() => {
+        const update = () => setState({ events, status });
+        listeners.add(update);
+        startEventTrack();
+        update();
+        // Closing the panel only removes its subscription, leaving the socket alive.
+        return () => { listeners.delete(update); };
     }, []);
-    return { events, status };
+    return state;
 }
 function formatTimeMMSS(seconds) {
     const rounded = Math.max(0, Math.round(seconds));
@@ -150,6 +159,7 @@ function EventTrackComponent() {
 class EventTrack {
     constructor() {
         var _a;
+        startEventTrack();
         StellarAPI_1.default.UI.registerSettingsModel("isqol-event-track", (0, preact_1.h)(EventTrackComponent, null));
         this.eventTrackButton = document.createElement("button");
         this.eventTrackButton.innerHTML =
